@@ -7,7 +7,7 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 ### Windows
 1. **Execute o arquivo:**
    ```
-   iniciar_windows_melhorado.bat
+   iniciar_windows_final.bat
    ```
 
 2. **O navegador abrirá automaticamente em:**
@@ -23,13 +23,14 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 ```
 Slide/
 ├── app/
-│   ├── server_windows_improved.py  # Servidor Python
-│   ├── index_corrigido.html        # Interface principal
-│   ├── script_corrigido.js         # JavaScript
-│   └── styles.css                  # Estilos CSS
-├── Fotos/                          # Suas fotos aqui
-├── iniciar_windows_melhorado.bat   # Iniciador Windows
-└── README.md                       # Este arquivo
+│   ├── server_windows_fixed.py    # ✅ Servidor corrigido
+│   ├── index_corrigido.html       # ✅ Interface principal
+│   ├── script_corrigido.js        # ✅ JavaScript
+│   └── styles.css                 # ✅ Estilos CSS
+├── Fotos/                         # ✅ Suas fotos aqui
+├── iniciar_windows_final.bat      # ✅ Iniciador final
+├── limpar_cache.bat               # ✅ Limpeza de cache
+└── README.md                      # ✅ Este arquivo
 ```
 
 ## 📸 Adicionar Fotos
@@ -59,11 +60,24 @@ taskkill /f /im python.exe
 
 ### Se a porta 5000 estiver em uso:
 ```cmd
-netstat -ano | find "5000"
-taskkill /f /pid [PID_NUMBER]
+limpar_cache.bat
 ```
+
+### Se aparecer erro de caracteres estranhos:
+1. Execute `limpar_cache.bat`
+2. Execute `iniciar_windows_final.bat`
+
+### Se o navegador não carregar:
+1. Limpe o cache do navegador (Ctrl+Shift+Del)
+2. Execute `limpar_cache.bat`
+3. Execute `iniciar_windows_final.bat`
+
+## 🔄 Versões
+
+- **v2.0** - Servidor melhorado com Ctrl+C funcional
+- **v2.1** - Correção de encoding e limpeza de cache
 
 ---
 
-**Versão:** 2.0 - Servidor Melhorado  
+**Versão:** 2.1 - Servidor Corrigido  
 **Status:** ✅ Funcional 
