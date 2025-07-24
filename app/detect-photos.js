@@ -42,7 +42,7 @@ class PhotoDetector {
         ];
         
         for (const photoName of knownPhotos) {
-            const photoPath = `/fotos/${photoName}`;
+            const photoPath = `/Fotos/${photoName}`;
             if (await this.checkPhotoExists(photoPath)) {
                 photos.push(photoPath);
             }

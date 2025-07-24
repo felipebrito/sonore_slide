@@ -14,7 +14,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         # Redirecionar raiz para a aplicação
         if self.path == '/':
             self.send_response(302)
-            self.send_header('Location', '/index_simple.html')
+            self.send_header('Location', '/index_corrigido.html')
             self.end_headers()
             return
         
