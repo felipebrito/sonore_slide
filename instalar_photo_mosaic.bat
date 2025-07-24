@@ -8,6 +8,9 @@ echo    📸 Photo Mosaic - Instalador
 echo ========================================
 echo.
 
+:: Mudar para pasta app
+cd app
+
 :: Verificar se Python está instalado
 python --version >nul 2>&1
 if errorlevel 1 (

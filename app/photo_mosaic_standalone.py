@@ -62,9 +62,9 @@ class PhotoServer(SimpleHTTPRequestHandler):
         self.end_headers()
     
     def get_photos_from_directory(self):
-        """Lista todas as fotos na pasta Fotos/"""
+        """Lista todas as fotos na pasta Fotos/ (um nível acima)"""
         photos = []
-        fotos_dir = os.path.join(os.getcwd(), 'Fotos')
+        fotos_dir = os.path.join(os.path.dirname(os.getcwd()), 'Fotos')
         
         if os.path.exists(fotos_dir):
             for filename in os.listdir(fotos_dir):
@@ -120,7 +120,7 @@ def main():
     # Verificar se estamos no diretório correto
     if not os.path.exists('index.html'):
         print("❌ Erro: index.html não encontrado!")
-        print("   Execute este script na pasta do Photo Mosaic")
+        print("   Execute este script na pasta app do Photo Mosaic")
         input("Pressione Enter para sair...")
         return
     

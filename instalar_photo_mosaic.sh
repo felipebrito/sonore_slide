@@ -13,6 +13,9 @@ echo "    📸 Photo Mosaic - Instalador"
 echo "========================================"
 echo -e "${NC}"
 
+# Mudar para pasta app
+cd app
+
 # Verificar se Python está instalado
 if ! command -v python3 &> /dev/null; then
     echo -e "${RED}❌ Python 3 não encontrado!${NC}"
