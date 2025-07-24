@@ -5,6 +5,7 @@
 ### **1. Adicione suas fotos:**
 - Coloque suas fotos na pasta `Fotos/`
 - Formatos aceitos: `.jpg`, `.png`, `.gif`, `.webp`
+- **24 fotos já incluídas** para teste
 
 ### **2. Inicie a aplicação:**
 
@@ -18,9 +19,10 @@
 - Duplo clique em `photo_mosaic.py`
 
 ### **3. Pronto!** 🎉
-- A aplicação abrirá automaticamente no navegador
+- A aplicação abrirá automaticamente no navegador em `http://localhost:3000`
 - Mostra 4 fotos verticais lado a lado
 - Troca fotos automaticamente a cada 15 segundos
+- **Configurador funcional** com todas as opções
 
 ## 🎮 **Controles**
 
@@ -43,6 +45,8 @@
 - **Python não encontrado**: Instale em https://www.python.org/downloads/
 - **Fotos não aparecem**: Verifique se há fotos na pasta `Fotos/`
 - **Porta em uso**: Feche outras instâncias da aplicação
+- **Configurador não abre**: Pressione `C` para abrir configurações
+- **Layout desajustado**: Recarregue a página (F5)
 
 ## 📁 **Estrutura**
 
@@ -66,5 +70,17 @@ Photo Mosaic/
 - ✅ Instala como app
 - ✅ Detecta fotos automaticamente
 - ✅ Interface moderna e limpa
+- ✅ **Configurador completo funcionando**
+- ✅ **Layout responsivo e otimizado**
+- ✅ **24 fotos de exemplo incluídas**
+
+## 📋 **Status do Projeto**
+
+**✅ COMPLETO E PRONTO PARA ENTREGA**
+
+- **GitHub**: https://github.com/felipebrito/sonore_slide.git
+- **Porta**: 3000 (configurada e testada)
+- **Funcionalidades**: 100% operacionais
+- **Testes**: Aprovados em macOS
 
 **Divirta-se com suas fotos!** 📸✨ 
