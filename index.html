@@ -3,70 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosaico de Fotos</title>
+    <title>Photo Mosaic - Slides Automático</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Aplicação de slides automático com layout 4 verticais e transições suaves">
+    <meta name="theme-color" content="#000000">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Photo Mosaic">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/icon-16x16.png">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Styles -->
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="mosaic" id="mosaic">
-        <!-- As fotos serão carregadas dinamicamente aqui -->
-    </div>
+    <div id="mosaic" class="mosaic"></div>
     
-    <!-- Modal de Configuração -->
+    <!-- Modal de Configurações -->
     <div id="configModal" class="config-modal">
         <div class="config-content">
             <div class="config-header">
                 <h2>⚙️ Configurações</h2>
-                <button class="close-btn" onclick="closeConfigModal()">×</button>
+                <button class="close-btn" onclick="closeConfigModal()">&times;</button>
             </div>
-            
             <div class="config-body">
-                <div class="config-section">
-                    <h3>🕒 Temporizadores</h3>
-                    <div class="config-item">
-                        <label for="rotationInterval">Rotação Automática (segundos):</label>
-                        <input type="number" id="rotationInterval" min="5" max="300" value="15">
-                    </div>
-                    <div class="config-item">
-                        <label for="checkInterval">Verificação de Novas Fotos (segundos):</label>
-                        <input type="number" id="checkInterval" min="10" max="600" value="30">
-                    </div>
+                <div class="config-group">
+                    <label for="rotationInterval">Intervalo de Rotação (ms):</label>
+                    <input type="number" id="rotationInterval" value="15000" min="5000" max="60000">
                 </div>
-                
-                <div class="config-section">
-                    <h3>🎲 Controles</h3>
-                    <div class="config-item">
-                        <button class="config-btn" onclick="photoMosaic.addRandomPhoto()">Adicionar Foto</button>
-                        <button class="config-btn" onclick="photoMosaic.shufflePhotos()">Embaralhar</button>
-                    </div>
+                <div class="config-group">
+                    <label for="checkInterval">Intervalo de Verificação (ms):</label>
+                    <input type="number" id="checkInterval" value="5000" min="2000" max="30000">
                 </div>
-                
-                <div class="config-section">
-                    <h3>📊 Status</h3>
-                    <div class="config-item">
-                        <div id="status" class="status-display">Carregando fotos...</div>
-                    </div>
-                </div>
-                
-                <div class="config-section">
-                    <h3>🎮 Atalhos</h3>
-                    <div class="config-item shortcuts">
-                        <div><strong>C</strong> - Abrir/Fechar configurações</div>
-                        <div><strong>R</strong> - Adicionar foto aleatória</div>
-                        <div><strong>S</strong> - Embaralhar fotos</div>
-                        <div><strong>ESC</strong> - Fechar modal</div>
-                    </div>
+                <div class="config-actions">
+                    <button onclick="saveConfig()">💾 Salvar</button>
+                    <button onclick="shufflePhotos()">🔄 Embaralhar</button>
+                    <button onclick="addRandomPhoto()">➕ Adicionar Foto</button>
                 </div>
             </div>
-            
             <div class="config-footer">
-                <button class="config-btn primary" onclick="saveConfig()">Salvar Configurações</button>
-                <button class="config-btn" onclick="closeConfigModal()">Cancelar</button>
+                <div class="shortcuts">
+                    <strong>Atalhos:</strong> C=Config | R=Adicionar | S=Embaralhar | ESC=Fechar
+                </div>
+                <div class="status" id="status"></div>
             </div>
         </div>
     </div>
-    
-    <script src="config.js"></script>
+
+    <!-- Modal Fullscreen -->
+    <div id="fullscreenModal" class="fullscreen-modal">
+        <div class="fullscreen-content">
+            <img id="fullscreenImage" src="" alt="Foto em tela cheia">
+            <button class="close-fullscreen" onclick="closeFullscreen()">&times;</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="detect-photos.js"></script>
     <script src="script.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Registrar Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker registrado:', registration.scope);
+                        
+                        // Verificar atualizações
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    console.log('🔄 Nova versão disponível');
+                                    if (confirm('Nova versão disponível! Deseja atualizar?')) {
+                                        newWorker.postMessage({type: 'SKIP_WAITING'});
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.log('❌ Falha no registro do Service Worker:', error);
+                    });
+            });
+        }
+
+        // Instalar PWA
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Mostrar botão de instalação se necessário
+            const installButton = document.createElement('button');
+            installButton.textContent = '📱 Instalar App';
+            installButton.className = 'install-button';
+            installButton.onclick = () => {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('✅ App instalado');
+                    }
+                    deferredPrompt = null;
+                });
+            };
+            
+            // Adicionar botão temporariamente
+            setTimeout(() => {
+                if (installButton.parentNode) {
+                    installButton.parentNode.removeChild(installButton);
+                }
+            }, 10000);
+        });
+    </script>
 </body>
 </html> 
