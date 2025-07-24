@@ -17,10 +17,10 @@ body {
 .mosaic {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 4px;
+    gap: 0;
     width: 100vw;
     height: 100vh;
-    padding: 4px;
+    padding: 0;
     box-sizing: border-box;
     background: #000000;
 }
@@ -28,8 +28,8 @@ body {
 .mosaic-item {
     aspect-ratio: 1/2;
     background: #1a1a1a;
-    border: 2px solid #333;
-    border-radius: 8px;
+    border: none;
+    border-radius: 0;
     overflow: hidden;
     position: relative;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
