@@ -10,8 +10,9 @@
 ### **2. Inicie a aplicação:**
 
 **Windows:**
-- Duplo clique em `iniciar_windows.bat` (recomendado)
-- Ou duplo clique em `instalar_photo_mosaic.bat`
+- **Primeiro**: Duplo clique em `teste_python.bat` para verificar se Python funciona
+- **Se funcionar**: Duplo clique em `iniciar_windows.bat`
+- **Se não funcionar**: Leia `INSTRUCOES_WINDOWS.txt`
 
 **Mac/Linux:**
 - Duplo clique em `instalar_photo_mosaic.sh`
@@ -48,14 +49,17 @@
 - **Porta em uso**: Feche outras instâncias da aplicação
 - **Configurador não abre**: Pressione `C` para abrir configurações
 - **Layout desajustado**: Recarregue a página (F5)
-- **Windows - Erro de comando**: Use `iniciar_windows.bat` em vez de `instalar_photo_mosaic.bat`
+- **Windows - Erro de comando**: Use `teste_python.bat` primeiro, depois `iniciar_windows.bat`
+- **Windows - Python não encontrado**: Leia `INSTRUCOES_WINDOWS.txt`
 
 ## 📁 **Estrutura**
 
 ```
 Photo Mosaic/
-├── 🪟 iniciar_windows.bat           # Windows - Duplo clique (RECOMENDADO)
+├── 🪟 teste_python.bat              # Windows - Teste Python primeiro
+├── 🪟 iniciar_windows.bat           # Windows - Iniciar aplicação
 ├── 🪟 instalar_photo_mosaic.bat     # Windows - Alternativo
+├── 📖 INSTRUCOES_WINDOWS.txt        # Windows - Instruções detalhadas
 ├── 🐧 instalar_photo_mosaic.sh      # Mac/Linux - Duplo clique
 ├── 🐍 photo_mosaic.py               # Python - Duplo clique
 ├── 📁 Fotos/                        # Suas imagens aqui

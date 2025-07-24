@@ -24,6 +24,6 @@ echo Pressione Ctrl+C para parar
 echo.
 
 start http://localhost:5000
-python simple-server.py
+python server_windows.py
 
 pause 
