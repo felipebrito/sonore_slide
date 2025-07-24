@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Teste Photo Mosaic</title>
+    <style>
+        body {
+            background: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .mosaic {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+        .mosaic-item {
+            aspect-ratio: 1/2;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 0;
+            overflow: hidden;
+            position: relative;
+            min-height: 200px;
+        }
+        .mosaic-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .test-info {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <div>Status: Carregando...</div>
+        <div id="photo-count">Fotos: 0</div>
+        <div id="status">Aguardando...</div>
+    </div>
+
+    <div id="mosaic" class="mosaic">
+        <div class="mosaic-item">
+            <img src="/Fotos/foto1.jpg" alt="Foto 1" onload="updateStatus('Foto 1 carregada')" onerror="updateStatus('Erro ao carregar Foto 1')">
+        </div>
+        <div class="mosaic-item">
+            <img src="/Fotos/foto2.jpg" alt="Foto 2" onload="updateStatus('Foto 2 carregada')" onerror="updateStatus('Erro ao carregar Foto 2')">
+        </div>
+        <div class="mosaic-item">
+            <img src="/Fotos/foto3.jpg" alt="Foto 3" onload="updateStatus('Foto 3 carregada')" onerror="updateStatus('Erro ao carregar Foto 3')">
+        </div>
+        <div class="mosaic-item">
+            <img src="/Fotos/foto4.jpg" alt="Foto 4" onload="updateStatus('Foto 4 carregada')" onerror="updateStatus('Erro ao carregar Foto 4')">
+        </div>
+    </div>
+
+    <script>
+        console.log('🚀 Teste Photo Mosaic iniciado');
+        
+        function updateStatus(message) {
+            console.log(message);
+            document.getElementById('status').textContent = message;
+        }
+        
+        // Testar API
+        fetch('/api/photos')
+            .then(response => response.json())
+            .then(photos => {
+                console.log('✅ API funcionando:', photos.length, 'fotos');
+                document.getElementById('photo-count').textContent = 'Fotos: ' + photos.length;
+                updateStatus('API OK - ' + photos.length + ' fotos');
+            })
+            .catch(error => {
+                console.error('❌ Erro na API:', error);
+                updateStatus('Erro na API: ' + error.message);
+            });
+        
+        // Verificar se as imagens carregaram
+        window.addEventListener('load', () => {
+            const images = document.querySelectorAll('img');
+            let loaded = 0;
+            let errors = 0;
+            
+            images.forEach(img => {
+                if (img.complete) {
+                    if (img.naturalWidth > 0) {
+                        loaded++;
+                    } else {
+                        errors++;
+                    }
+                }
+            });
+            
+            updateStatus(`Carregadas: ${loaded}, Erros: ${errors}`);
+        });
+    </script>
+</body>
+</html> 
