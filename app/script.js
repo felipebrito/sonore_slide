@@ -621,6 +621,11 @@ function saveConfig() {
     const rotationInput = document.getElementById('rotationInterval');
     const checkInput = document.getElementById('checkInterval');
     
+    if (!rotationInput || !checkInput) {
+        console.error('Elementos de configuração não encontrados');
+        return;
+    }
+    
     const newConfig = {
         rotationInterval: parseInt(rotationInput.value) * 1000,
         checkInterval: parseInt(checkInput.value) * 1000
@@ -628,9 +633,37 @@ function saveConfig() {
     
     if (window.photoMosaic) {
         window.photoMosaic.updateConfig(newConfig);
+        console.log('✅ Configurações salvas:', newConfig);
+    } else {
+        console.error('❌ PhotoMosaic não inicializado');
     }
     
     closeConfigModal();
+}
+
+function shufflePhotos() {
+    if (window.photoMosaic) {
+        window.photoMosaic.shufflePhotos();
+        console.log('🔄 Fotos embaralhadas');
+    } else {
+        console.error('❌ PhotoMosaic não inicializado');
+    }
+}
+
+function addRandomPhoto() {
+    if (window.photoMosaic) {
+        window.photoMosaic.addRandomPhoto();
+        console.log('➕ Foto aleatória adicionada');
+    } else {
+        console.error('❌ PhotoMosaic não inicializado');
+    }
+}
+
+function closeFullscreen() {
+    const modal = document.getElementById('fullscreenModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Inicializa a aplicação quando a página carregar

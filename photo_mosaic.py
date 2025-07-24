@@ -16,11 +16,16 @@ def main():
     print("=" * 50)
     print()
     
+    # Obter o diretório onde o script está localizado
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    app_dir = os.path.join(script_dir, 'app')
+    
     # Verificar se pasta app existe
-    app_dir = os.path.join(os.path.dirname(__file__), 'app')
     if not os.path.exists(app_dir):
         print("❌ Erro: Pasta 'app' não encontrada!")
         print("   Certifique-se de que todos os arquivos estão presentes")
+        print(f"   Diretório atual: {script_dir}")
+        print(f"   Pasta app esperada: {app_dir}")
         input("Pressione Enter para sair...")
         return
     

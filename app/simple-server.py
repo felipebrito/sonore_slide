@@ -31,9 +31,35 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(photos).encode())
             return
         
-        # Servir arquivos estáticos
+        # Servir fotos da pasta Fotos/
+        elif self.path.startswith('/Fotos/'):
+            # Construir caminho para pasta Fotos na raiz (um nível acima de app/)
+            fotos_dir = os.path.join(os.path.dirname(os.getcwd()), 'Fotos')
+            photo_path = self.path[7:]  # Remove '/Fotos/' prefix
+            full_path = os.path.join(fotos_dir, photo_path)
+            
+            print(f"Tentando servir foto: {full_path}")
+            print(f"Arquivo existe: {os.path.exists(full_path)}")
+            
+            if os.path.exists(full_path) and os.path.isfile(full_path):
+                self.send_response(200)
+                
+                # Determinar tipo MIME
+                content_type, _ = mimetypes.guess_type(full_path)
+                if content_type:
+                    self.send_header('Content-type', content_type)
+                
+                self.end_headers()
+                
+                with open(full_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_error(404, f'Photo not found: {full_path}')
+            return
+        
+        # Servir arquivos estáticos da pasta app
         elif self.path.startswith('/'):
-            # Verificar se arquivo existe
+            # Verificar se arquivo existe na pasta app
             file_path = os.path.join(os.getcwd(), self.path.lstrip('/'))
             if os.path.exists(file_path) and os.path.isfile(file_path):
                 self.send_response(200)
@@ -66,20 +92,26 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         photos = []
         fotos_dir = os.path.join(os.path.dirname(os.getcwd()), 'Fotos')
         
+        print(f"Procurando fotos em: {fotos_dir}")
+        print(f"Diretório existe: {os.path.exists(fotos_dir)}")
+        
         if os.path.exists(fotos_dir):
             for filename in os.listdir(fotos_dir):
                 if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
                     photos.append(f'/Fotos/{filename}')
         
+        print(f"Fotos encontradas: {len(photos)}")
         return sorted(photos)
 
 if __name__ == "__main__":
-    PORT = 8000
+    PORT = 3000
     
     try:
         with socketserver.TCPServer(("", PORT), PhotoServer) as httpd:
             print(f"✅ Servidor iniciado na porta {PORT}")
             print(f"📍 Acesse: http://localhost:{PORT}")
+            print(f"📁 Diretório atual: {os.getcwd()}")
+            print(f"📁 Pasta Fotos: {os.path.join(os.path.dirname(os.getcwd()), 'Fotos')}")
             print()
             print("💡 Dicas:")
             print("   - Pressione C para configurações")

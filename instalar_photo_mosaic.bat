@@ -8,8 +8,23 @@ echo    📸 Photo Mosaic - Instalador
 echo ========================================
 echo.
 
+:: Obter o diretório onde o script está localizado
+set "SCRIPT_DIR=%~dp0"
+set "APP_DIR=%SCRIPT_DIR%app"
+
+:: Verificar se a pasta app existe
+if not exist "%APP_DIR%" (
+    echo ❌ Erro: Pasta 'app' não encontrada!
+    echo.
+    echo Certifique-se de que todos os arquivos estão presentes
+    echo Diretório atual: %SCRIPT_DIR%
+    echo Pasta app esperada: %APP_DIR%
+    pause
+    exit /b 1
+)
+
 :: Mudar para pasta app
-cd app
+cd /d "%APP_DIR%"
 
 :: Verificar se Python está instalado
 python --version >nul 2>&1
@@ -31,7 +46,7 @@ python --version
 echo.
 echo 🚀 Iniciando Photo Mosaic...
 echo.
-echo 📍 Aplicação será aberta em: http://localhost:8000
+echo 📍 Aplicação será aberta em: http://localhost:3000
 echo.
 echo 💡 Dicas:
 echo    - Pressione C para configurações

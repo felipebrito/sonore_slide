@@ -13,8 +13,21 @@ echo "    📸 Photo Mosaic - Instalador"
 echo "========================================"
 echo -e "${NC}"
 
+# Obter o diretório onde o script está localizado
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+APP_DIR="$SCRIPT_DIR/app"
+
+# Verificar se a pasta app existe
+if [ ! -d "$APP_DIR" ]; then
+    echo -e "${RED}❌ Erro: Pasta 'app' não encontrada!${NC}"
+    echo "   Certifique-se de que todos os arquivos estão presentes"
+    echo "   Diretório atual: $SCRIPT_DIR"
+    echo "   Pasta app esperada: $APP_DIR"
+    exit 1
+fi
+
 # Mudar para pasta app
-cd app
+cd "$APP_DIR"
 
 # Verificar se Python está instalado
 if ! command -v python3 &> /dev/null; then
@@ -35,7 +48,7 @@ python3 --version
 echo ""
 echo -e "${YELLOW}🚀 Iniciando Photo Mosaic...${NC}"
 echo ""
-echo -e "${BLUE}📍 Aplicação será aberta em: http://localhost:8000${NC}"
+echo -e "${BLUE}📍 Aplicação será aberta em: http://localhost:3000${NC}"
 echo ""
 echo -e "${GREEN}💡 Dicas:${NC}"
 echo "   - Pressione C para configurações"
@@ -49,10 +62,10 @@ echo ""
 # Tentar abrir navegador automaticamente
 if command -v open &> /dev/null; then
     # macOS
-    (sleep 2 && open http://localhost:8000) &
+    (sleep 2 && open http://localhost:3000) &
 elif command -v xdg-open &> /dev/null; then
     # Linux
-    (sleep 2 && xdg-open http://localhost:8000) &
+    (sleep 2 && xdg-open http://localhost:3000) &
 fi
 
 # Iniciar servidor Python

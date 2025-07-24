@@ -37,9 +37,32 @@ class PhotoServer(SimpleHTTPRequestHandler):
             self.wfile.write(json.dumps(photos).encode())
             return
         
-        # Servir arquivos estáticos
+        # Servir fotos da pasta Fotos/
+        elif self.path.startswith('/Fotos/'):
+            # Construir caminho para pasta Fotos na raiz
+            fotos_dir = os.path.join(os.path.dirname(os.getcwd()), 'Fotos')
+            photo_path = self.path[7:]  # Remove '/Fotos/' prefix
+            full_path = os.path.join(fotos_dir, photo_path)
+            
+            if os.path.exists(full_path) and os.path.isfile(full_path):
+                self.send_response(200)
+                
+                # Determinar tipo MIME
+                content_type, _ = mimetypes.guess_type(full_path)
+                if content_type:
+                    self.send_header('Content-type', content_type)
+                
+                self.end_headers()
+                
+                with open(full_path, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_error(404, 'Photo not found')
+            return
+        
+        # Servir arquivos estáticos da pasta app
         elif self.path.startswith('/'):
-            # Verificar se arquivo existe
+            # Verificar se arquivo existe na pasta app
             file_path = os.path.join(os.getcwd(), self.path.lstrip('/'))
             if os.path.exists(file_path) and os.path.isfile(file_path):
                 self.send_response(200)
