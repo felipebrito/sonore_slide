@@ -17,6 +17,13 @@ import mimetypes
 
 class PhotoServer(SimpleHTTPRequestHandler):
     def do_GET(self):
+        # Redirecionar raiz para a aplicação
+        if self.path == '/':
+            self.send_response(302)
+            self.send_header('Location', '/index.html')
+            self.end_headers()
+            return
+        
         # API para listar fotos
         if self.path == '/api/photos':
             self.send_response(200)
@@ -32,10 +39,6 @@ class PhotoServer(SimpleHTTPRequestHandler):
         
         # Servir arquivos estáticos
         elif self.path.startswith('/'):
-            # Mapear caminhos
-            if self.path == '/':
-                self.path = '/index.html'
-            
             # Verificar se arquivo existe
             file_path = os.path.join(os.getcwd(), self.path.lstrip('/'))
             if os.path.exists(file_path) and os.path.isfile(file_path):
@@ -51,7 +54,10 @@ class PhotoServer(SimpleHTTPRequestHandler):
                 with open(file_path, 'rb') as f:
                     self.wfile.write(f.read())
             else:
-                self.send_error(404, 'File not found')
+                # Se arquivo não existe, redirecionar para index.html
+                self.send_response(302)
+                self.send_header('Location', '/index.html')
+                self.end_headers()
             return
     
     def do_OPTIONS(self):
