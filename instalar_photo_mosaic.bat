@@ -46,7 +46,7 @@ python --version
 echo.
 echo 🚀 Iniciando Photo Mosaic...
 echo.
-echo 📍 Aplicação será aberta em: http://localhost:3000
+echo 📍 Aplicação será aberta em: http://localhost:5000
 echo.
 echo 💡 Dicas:
 echo    - Pressione C para configurações

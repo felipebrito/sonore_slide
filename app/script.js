@@ -589,7 +589,13 @@ class PhotoMosaic {
 
 // Funções do modal
 function toggleConfigModal() {
+    console.log('🔧 Tentando abrir/fechar modal de configurações...');
     const modal = document.getElementById('configModal');
+    if (!modal) {
+        console.error('❌ Modal de configurações não encontrado');
+        return;
+    }
+    
     if (modal.style.display === 'block') {
         closeConfigModal();
     } else {
@@ -598,18 +604,36 @@ function toggleConfigModal() {
 }
 
 function openConfigModal() {
+    console.log('🔧 Abrindo modal de configurações...');
     const modal = document.getElementById('configModal');
     const rotationInput = document.getElementById('rotationInterval');
     const checkInput = document.getElementById('checkInterval');
+    
+    if (!modal) {
+        console.error('❌ Modal não encontrado');
+        return;
+    }
+    
+    if (!rotationInput || !checkInput) {
+        console.error('❌ Campos de configuração não encontrados');
+        return;
+    }
     
     // Carrega as configurações atuais
     if (window.photoMosaic) {
         const config = window.photoMosaic.getConfig();
         rotationInput.value = config.rotationInterval / 1000;
         checkInput.value = config.checkInterval / 1000;
+        console.log('✅ Configurações carregadas:', config);
+    } else {
+        console.error('❌ PhotoMosaic não inicializado');
+        // Define valores padrão
+        rotationInput.value = 15;
+        checkInput.value = 30;
     }
     
     modal.style.display = 'block';
+    console.log('✅ Modal aberto');
 }
 
 function closeConfigModal() {
@@ -668,7 +692,13 @@ function closeFullscreen() {
 
 // Inicializa a aplicação quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
-    window.photoMosaic = new PhotoMosaic();
+    console.log('🚀 Iniciando PhotoMosaic...');
+    try {
+        window.photoMosaic = new PhotoMosaic();
+        console.log('✅ PhotoMosaic inicializado com sucesso');
+    } catch (error) {
+        console.error('❌ Erro ao inicializar PhotoMosaic:', error);
+    }
 });
 
 // Adiciona funcionalidade de drag and drop para upload de fotos

@@ -104,7 +104,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         return sorted(photos)
 
 if __name__ == "__main__":
-    PORT = 3000
+    PORT = 5000
     
     try:
         with socketserver.TCPServer(("", PORT), PhotoServer) as httpd:
