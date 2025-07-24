@@ -1,93 +1,69 @@
-# 📸 Photo Mosaic - Slides Automático
+# Photo Mosaic - Slides Automático
 
-## 🚀 **Como Usar (Super Fácil!)**
+Uma aplicação web simples para exibir fotos em formato de slides automático.
 
-### **1. Adicione suas fotos:**
-- Coloque suas fotos na pasta `Fotos/`
-- Formatos aceitos: `.jpg`, `.png`, `.gif`, `.webp`
-- **24 fotos já incluídas** para teste
+## 🚀 Como Usar
 
-### **2. Inicie a aplicação:**
+### Windows
+1. **Execute o arquivo:**
+   ```
+   iniciar_windows_melhorado.bat
+   ```
 
-**Windows:**
-- **Primeiro**: Duplo clique em `teste_python.bat` para verificar se Python funciona
-- **Se funcionar**: Duplo clique em `iniciar_windows.bat`
-- **Se não funcionar**: Leia `INSTRUCOES_WINDOWS.txt`
+2. **O navegador abrirá automaticamente em:**
+   ```
+   http://localhost:5000
+   ```
 
-**Mac/Linux:**
-- Duplo clique em `instalar_photo_mosaic.sh`
+3. **Para parar o servidor:**
+   - Pressione `Ctrl+C` no terminal
 
-**Python:**
-- Duplo clique em `photo_mosaic.py`
-
-### **3. Pronto!** 🎉
-- A aplicação abrirá automaticamente no navegador em `http://localhost:3000`
-- Mostra 4 fotos verticais lado a lado
-- Troca fotos automaticamente a cada 15 segundos
-- **Configurador funcional** com todas as opções
-
-## 🎮 **Controles**
-
-| Tecla | Função |
-|-------|--------|
-| `C` | ⚙️ Configurações |
-| `R` | ➕ Adicionar foto |
-| `S` | 🔄 Embaralhar |
-| `ESC` | ❌ Fechar |
-| `Clique` | 🔍 Tela cheia |
-
-## 📱 **Instalar como App**
-
-1. Abra a aplicação no navegador
-2. Clique em "📱 Instalar App" (se aparecer)
-3. Ou use o menu: "Adicionar à tela inicial"
-
-## 🛠️ **Se Algo Não Funcionar**
-
-- **Python não encontrado**: Instale em https://www.python.org/downloads/
-- **Fotos não aparecem**: Verifique se há fotos na pasta `Fotos/`
-- **Porta em uso**: Feche outras instâncias da aplicação
-- **Configurador não abre**: Pressione `C` para abrir configurações
-- **Layout desajustado**: Recarregue a página (F5)
-- **Windows - Erro de comando**: Use `teste_python.bat` primeiro, depois `iniciar_windows.bat`
-- **Windows - Python não encontrado**: Leia `INSTRUCOES_WINDOWS.txt`
-
-## 📁 **Estrutura**
+## 📁 Estrutura de Arquivos
 
 ```
-Photo Mosaic/
-├── 🪟 teste_python.bat              # Windows - Teste Python primeiro
-├── 🪟 iniciar_windows.bat           # Windows - Iniciar aplicação
-├── 🪟 instalar_photo_mosaic.bat     # Windows - Alternativo
-├── 📖 INSTRUCOES_WINDOWS.txt        # Windows - Instruções detalhadas
-├── 🐧 instalar_photo_mosaic.sh      # Mac/Linux - Duplo clique
-├── 🐍 photo_mosaic.py               # Python - Duplo clique
-├── 📁 Fotos/                        # Suas imagens aqui
-├── 📁 app/                          # Arquivos da aplicação
-└── 📖 README.md                     # Este arquivo
+Slide/
+├── app/
+│   ├── server_windows_improved.py  # Servidor Python
+│   ├── index_corrigido.html        # Interface principal
+│   ├── script_corrigido.js         # JavaScript
+│   └── styles.css                  # Estilos CSS
+├── Fotos/                          # Suas fotos aqui
+├── iniciar_windows_melhorado.bat   # Iniciador Windows
+└── README.md                       # Este arquivo
+```
+
+## 📸 Adicionar Fotos
+
+1. Coloque suas fotos na pasta `Fotos/`
+2. Formatos suportados: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`
+3. Reinicie o servidor para carregar novas fotos
+
+## ⌨️ Atalhos
+
+- **C** = Abrir configurações
+- **R** = Adicionar foto aleatória
+- **S** = Embaralhar fotos
+- **ESC** = Fechar modais
+
+## 🔧 Requisitos
+
+- Python 3.6+
+- Windows 10/11
+
+## 🛠️ Troubleshooting
+
+### Se o servidor não parar com Ctrl+C:
+```cmd
+taskkill /f /im python.exe
+```
+
+### Se a porta 5000 estiver em uso:
+```cmd
+netstat -ano | find "5000"
+taskkill /f /pid [PID_NUMBER]
 ```
 
 ---
 
-## 🎉 **Pronto para Usar!**
-
-**Aplicação profissional de slides que:**
-- ✅ Instala com duplo clique
-- ✅ Funciona offline
-- ✅ Instala como app
-- ✅ Detecta fotos automaticamente
-- ✅ Interface moderna e limpa
-- ✅ **Configurador completo funcionando**
-- ✅ **Layout responsivo e otimizado**
-- ✅ **24 fotos de exemplo incluídas**
-
-## 📋 **Status do Projeto**
-
-**✅ COMPLETO E PRONTO PARA ENTREGA**
-
-- **GitHub**: https://github.com/felipebrito/sonore_slide.git
-- **Porta**: 3000 (configurada e testada)
-- **Funcionalidades**: 100% operacionais
-- **Testes**: Aprovados em macOS
-
-**Divirta-se com suas fotos!** 📸✨ 
+**Versão:** 2.0 - Servidor Melhorado  
+**Status:** ✅ Funcional 
