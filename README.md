@@ -6,17 +6,15 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 ### Windows (Recomendado)
 
-#### Opção 1: Iniciador Simples (Universal)
+#### Iniciador Universal
 ```
 start.bat
 ```
+- O script verifica se o Python está instalado.
+- Se não estiver, abre o site de download e mostra instruções.
+- Depois de instalar, execute novamente o `start.bat`.
 
-#### Opção 2: Iniciador Completo (Universal)
-```
-iniciar_simples.bat
-```
-
-#### Opção 3: Manual
+#### Opção Manual
 ```
 python app\server_crossplatform.py
 ```
@@ -27,7 +25,7 @@ python3 app/server_crossplatform.py
 ```
 
 ### Passos:
-1. **Execute um dos arquivos acima**
+1. **Execute o arquivo acima**
 2. **O navegador abrirá automaticamente em:** `http://localhost:5000`
 3. **Para parar o servidor:** Pressione `Ctrl+C` no terminal
 
@@ -41,9 +39,7 @@ Slide/
 │   ├── script_corrigido.js         # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── start.bat                       # ✅ Iniciador simples universal
-├── iniciar_simples.bat             # ✅ Iniciador completo universal
-├── iniciar_windows_final.bat       # (legado)
+├── start.bat                       # ✅ Iniciador universal
 ├── limpar_cache.bat                # ✅ Limpeza de cache
 └── README.md                       # ✅ Este arquivo
 ```
@@ -70,7 +66,6 @@ Slide/
 
 ### Se aparecer erro de comando não reconhecido:
 1. **Use:** `start.bat` (versão universal)
-2. **Ou:** `iniciar_simples.bat` (completo)
 
 ### Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -88,12 +83,13 @@ limpar_cache.bat
 3. Execute `start.bat`
 
 ### Se Python não for encontrado:
-1. Instale Python de: https://python.org
-2. Marque "Add Python to PATH" durante a instalação
+1. O próprio `start.bat` abrirá o site de download
+2. Instale Python e marque "Add Python to PATH"
 3. Reinicie o prompt de comando
 
 ## 🔄 Versões
 
+- **v3.1** - Iniciador universal com verificação de Python
 - **v3.0** - Servidor universal multiplataforma
 - **v2.2** - Múltiplas opções de iniciador para compatibilidade
 - **v2.1** - Correção de encoding e limpeza de cache
@@ -101,5 +97,5 @@ limpar_cache.bat
 
 ---
 
-**Versão:** 3.0 - Universal  
+**Versão:** 3.1 - Universal com verificação de Python  
 **Status:** ✅ Funcional no Windows e Mac 
