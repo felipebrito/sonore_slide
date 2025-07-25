@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 echo ========================================
-echo    PHOTO MOSAIC - VERSÃO SIMPLES
+echo    PHOTO MOSAIC - VERSÃO UNIVERSAL
 echo ========================================
 echo.
 
@@ -28,8 +28,8 @@ if not exist "Fotos" (
     pause
     exit /b 1
 )
-if not exist "app\server_windows_fixed.py" (
-    echo ERRO: server_windows_fixed.py nao encontrado!
+if not exist "app\server_crossplatform.py" (
+    echo ERRO: server_crossplatform.py nao encontrado!
     pause
     exit /b 1
 )
@@ -55,11 +55,11 @@ if not errorlevel 1 (
     timeout /t 2 /nobreak >nul
 )
 
-echo 5. Iniciando servidor...
-cd /d "%~dp0app"
+echo 5. Iniciando servidor universal...
+cd /d "%~dp0"
 
 echo.
-echo INICIANDO: Photo Mosaic...
+echo INICIANDO: Photo Mosaic (Universal)...
 echo URL: http://localhost:5000
 echo STOP: Para parar: Pressione Ctrl+C
 echo.
@@ -67,7 +67,7 @@ echo.
 timeout /t 2 /nobreak >nul
 start http://localhost:5000
 
-python server_windows_fixed.py
+python app\server_crossplatform.py
 
 echo.
 echo OK: Servidor parado com sucesso!

@@ -4,21 +4,26 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 ## 🚀 Como Usar
 
-### Windows - Opções Disponíveis
+### Windows (Recomendado)
 
-#### Opção 1: Iniciador Simples (Recomendado)
+#### Opção 1: Iniciador Simples (Universal)
 ```
 start.bat
 ```
 
-#### Opção 2: Iniciador Completo
+#### Opção 2: Iniciador Completo (Universal)
 ```
 iniciar_simples.bat
 ```
 
-#### Opção 3: Iniciador Final (se as outras não funcionarem)
+#### Opção 3: Manual
 ```
-iniciar_windows_final.bat
+python app\server_crossplatform.py
+```
+
+### Mac/Linux
+```
+python3 app/server_crossplatform.py
 ```
 
 ### Passos:
@@ -31,16 +36,16 @@ iniciar_windows_final.bat
 ```
 Slide/
 ├── app/
-│   ├── server_windows_fixed.py    # ✅ Servidor corrigido
-│   ├── index_corrigido.html       # ✅ Interface principal
-│   ├── script_corrigido.js        # ✅ JavaScript
-│   └── styles.css                 # ✅ Estilos CSS
-├── Fotos/                         # ✅ Suas fotos aqui
-├── start.bat                      # ✅ Iniciador simples
-├── iniciar_simples.bat            # ✅ Iniciador completo
-├── iniciar_windows_final.bat      # ✅ Iniciador final
-├── limpar_cache.bat               # ✅ Limpeza de cache
-└── README.md                      # ✅ Este arquivo
+│   ├── server_crossplatform.py     # ✅ Servidor universal (Windows/Mac)
+│   ├── index_corrigido.html        # ✅ Interface principal
+│   ├── script_corrigido.js         # ✅ JavaScript
+│   └── styles.css                  # ✅ Estilos CSS
+├── Fotos/                          # ✅ Suas fotos aqui
+├── start.bat                       # ✅ Iniciador simples universal
+├── iniciar_simples.bat             # ✅ Iniciador completo universal
+├── iniciar_windows_final.bat       # (legado)
+├── limpar_cache.bat                # ✅ Limpeza de cache
+└── README.md                       # ✅ Este arquivo
 ```
 
 ## 📸 Adicionar Fotos
@@ -59,13 +64,13 @@ Slide/
 ## 🔧 Requisitos
 
 - Python 3.6+
-- Windows 10/11
+- Windows 10/11 ou Mac/Linux
 
 ## 🛠️ Troubleshooting
 
 ### Se aparecer erro de comando não reconhecido:
-1. **Use:** `start.bat` (versão mais simples)
-2. **Ou:** `iniciar_simples.bat` (sem encoding especial)
+1. **Use:** `start.bat` (versão universal)
+2. **Ou:** `iniciar_simples.bat` (completo)
 
 ### Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -89,11 +94,12 @@ limpar_cache.bat
 
 ## 🔄 Versões
 
-- **v2.0** - Servidor melhorado com Ctrl+C funcional
-- **v2.1** - Correção de encoding e limpeza de cache
+- **v3.0** - Servidor universal multiplataforma
 - **v2.2** - Múltiplas opções de iniciador para compatibilidade
+- **v2.1** - Correção de encoding e limpeza de cache
+- **v2.0** - Servidor melhorado com Ctrl+C funcional
 
 ---
 
-**Versão:** 2.2 - Múltiplas Opções  
-**Status:** ✅ Funcional 
+**Versão:** 3.0 - Universal  
+**Status:** ✅ Funcional no Windows e Mac 
