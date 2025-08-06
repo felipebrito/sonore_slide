@@ -354,9 +354,7 @@ class PhotoMosaic {
         };
         
         img.onerror = (event) => {
-            console.error(`❌ Erro ao carregar: ${photoUrl}`);
-            console.error(`📁 Arquivo: ${fileName}`);
-            console.error(`🔗 URL completa: ${finalUrl}`);
+            console.warn(`⚠️ Erro ao carregar: ${fileName}`);
             
             // Se é um arquivo AVIF e o navegador não suporta, tenta converter
             if (fileName.toLowerCase().endsWith('.avif') && this.avifSupported === false) {
@@ -367,32 +365,45 @@ class PhotoMosaic {
                 console.log(`🔄 Tentando formato alternativo: ${alternativeUrl}`);
                 
                 img.onerror = () => {
-                    this.showErrorImage(img, fileName, finalUrl);
+                    this.loadRandomImage(img, mosaicItem);
                 };
                 
                 img.src = alternativeUrl;
                 return;
             }
             
-            // Tenta verificar se o arquivo existe fazendo uma requisição HEAD
-            fetch(photoUrl, { method: 'HEAD' })
-                .then(response => {
-                    if (response.ok) {
-                        console.log(`✅ Arquivo existe no servidor (${response.status})`);
-                        console.log(`📊 Tamanho: ${response.headers.get('content-length') || 'desconhecido'} bytes`);
-                    } else {
-                        console.error(`❌ Arquivo não encontrado no servidor (${response.status})`);
-                    }
-                })
-                .catch(error => {
-                    console.error(`❌ Erro ao verificar arquivo: ${error.message}`);
-                });
-            
-            this.showErrorImage(img, fileName, finalUrl);
+            // Tenta carregar uma imagem aleatória da lista disponível
+            this.loadRandomImage(img, mosaicItem);
         };
         
         img.src = finalUrl;
         mosaicItem.appendChild(img);
+    }
+    
+    loadRandomImage(img, mosaicItem) {
+        // Tenta carregar uma imagem aleatória da lista disponível
+        if (this.availablePhotos.length > 0) {
+            const randomPhoto = this.availablePhotos[Math.floor(Math.random() * this.availablePhotos.length)];
+            const randomFileName = randomPhoto.split('/').pop();
+            
+            console.log(`🔄 Tentando carregar imagem aleatória: ${randomFileName}`);
+            
+            // Remove eventos de erro anteriores
+            img.onerror = null;
+            
+            // Adiciona novo evento de erro
+            img.onerror = () => {
+                console.warn(`⚠️ Falha ao carregar imagem aleatória: ${randomFileName}`);
+                this.showErrorImage(img, 'Imagem não disponível', randomPhoto);
+            };
+            
+            // Carrega a nova imagem
+            const timestamp = Date.now();
+            const finalUrl = randomPhoto.includes('?') ? `${randomPhoto}&t=${timestamp}` : `${randomPhoto}?t=${timestamp}`;
+            img.src = finalUrl;
+        } else {
+            this.showErrorImage(img, 'Nenhuma imagem disponível', '');
+        }
     }
     
     showErrorImage(img, fileName, retryUrl) {
@@ -400,16 +411,18 @@ class PhotoMosaic {
         img.src = `data:image/svg+xml;base64,${btoa(`
             <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
                 <rect width="100%" height="100%" fill="#2c3e50"/>
-                <text x="50%" y="40%" font-family="Arial" font-size="16" fill="#ecf0f1" text-anchor="middle">Erro ao carregar</text>
+                <text x="50%" y="40%" font-family="Arial" font-size="16" fill="#ecf0f1" text-anchor="middle">Carregando...</text>
                 <text x="50%" y="55%" font-family="Arial" font-size="12" fill="#bdc3c7" text-anchor="middle">${fileName}</text>
-                <text x="50%" y="70%" font-family="Arial" font-size="10" fill="#95a5a6" text-anchor="middle">Clique para tentar novamente</text>
+                <text x="50%" y="70%" font-family="Arial" font-size="10" fill="#95a5a6" text-anchor="middle">Aguarde...</text>
             </svg>
         `)}`;
         
         // Adiciona evento de clique para tentar recarregar
         img.onclick = () => {
             console.log(`🔄 Tentando recarregar: ${fileName}`);
-            img.src = retryUrl;
+            if (retryUrl) {
+                img.src = retryUrl;
+            }
         };
     }
     

@@ -211,6 +211,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         # Sem cache - sempre lê a pasta diretamente
         start_time = time.time()
         photos = []
+        valid_files = []
         
         timestamp = time.strftime("%H:%M:%S")
         print(f"[{timestamp}] 🔍 Iniciando leitura da pasta: {FOTOS_DIR}")
@@ -222,8 +223,21 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 
                 for filename in files:
                     if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
-                        photos.append(f'/Fotos/{filename}')
-                        print(f"[{timestamp}] ✅ Foto detectada: {filename}")
+                        # Verifica se o arquivo realmente existe e é acessível
+                        file_path = os.path.join(FOTOS_DIR, filename)
+                        if os.path.exists(file_path) and os.path.isfile(file_path):
+                            try:
+                                # Testa se o arquivo pode ser aberto (não está corrompido)
+                                with open(file_path, 'rb') as test_file:
+                                    test_file.read(1)  # Lê 1 byte para testar
+                                
+                                photos.append(f'/Fotos/{filename}')
+                                valid_files.append(filename)
+                                print(f"[{timestamp}] ✅ Foto válida: {filename}")
+                            except Exception as e:
+                                print(f"[{timestamp}] ⚠️ Arquivo corrompido/inacessível: {filename} - {e}")
+                        else:
+                            print(f"[{timestamp}] ⚠️ Arquivo não existe: {filename}")
                 
             except Exception as e:
                 print(f"[{timestamp}] ❌ Erro ao ler pasta: {e}")
@@ -234,7 +248,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         detection_time = (end_time - start_time) * 1000  # Convert to milliseconds
         
         # Log detalhado com timestamp
-        print(f"[{timestamp}] 📸 Detecção concluída: {len(photos)} fotos em {detection_time:.1f}ms")
+        print(f"[{timestamp}] 📸 Detecção concluída: {len(photos)} fotos válidas em {detection_time:.1f}ms")
+        if valid_files:
+            print(f"[{timestamp}] 📋 Arquivos válidos: {valid_files}")
         
         return sorted(photos)
 
