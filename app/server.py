@@ -103,40 +103,65 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 full_path = os.path.join(FOTOS_DIR, photo_path)
 
                 if os.path.exists(full_path) and os.path.isfile(full_path):
-                    self.send_response(200)
-                    
-                    # Detecção específica de MIME types para AVIF e outros formatos
-                    content_type = None
-                    if full_path.lower().endswith('.avif'):
-                        content_type = 'image/avif'
-                    elif full_path.lower().endswith('.webp'):
-                        content_type = 'image/webp'
-                    elif full_path.lower().endswith('.png'):
-                        content_type = 'image/png'
-                    elif full_path.lower().endswith(('.jpg', '.jpeg')):
-                        content_type = 'image/jpeg'
-                    elif full_path.lower().endswith('.gif'):
-                        content_type = 'image/gif'
-                    else:
-                        content_type, _ = mimetypes.guess_type(full_path)
-                    
-                    if content_type:
-                        self.send_header('Content-type', content_type)
-                    
-                    # Headers específicos para AVIF
-                    if full_path.lower().endswith('.avif'):
-                        self.send_header('Accept', 'image/avif,image/webp,image/jpeg,image/png')
-                        self.send_header('Vary', 'Accept')
-                    
-                    # Headers para cache de imagens
-                    self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
-                    self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
-                    self.send_header('Access-Control-Allow-Origin', '*')
-                    self.end_headers()
-                    
-                    with open(full_path, 'rb') as f:
-                        self.wfile.write(f.read())
+                    try:
+                        self.send_response(200)
+                        
+                        # Detecção específica de MIME types para AVIF e outros formatos
+                        content_type = None
+                        if full_path.lower().endswith('.avif'):
+                            content_type = 'image/avif'
+                        elif full_path.lower().endswith('.webp'):
+                            content_type = 'image/webp'
+                        elif full_path.lower().endswith('.png'):
+                            content_type = 'image/png'
+                        elif full_path.lower().endswith(('.jpg', '.jpeg')):
+                            content_type = 'image/jpeg'
+                        elif full_path.lower().endswith('.gif'):
+                            content_type = 'image/gif'
+                        else:
+                            content_type, _ = mimetypes.guess_type(full_path)
+                        
+                        if content_type:
+                            self.send_header('Content-type', content_type)
+                        
+                        # Headers específicos para AVIF
+                        if full_path.lower().endswith('.avif'):
+                            self.send_header('Accept', 'image/avif,image/webp,image/jpeg,image/png')
+                            self.send_header('Vary', 'Accept')
+                        
+                        # Headers para cache de imagens
+                        self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
+                        self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
+                        self.send_header('Access-Control-Allow-Origin', '*')
+                        self.end_headers()
+                        
+                        # Lê e envia o arquivo
+                        with open(full_path, 'rb') as f:
+                            file_data = f.read()
+                            self.wfile.write(file_data)
+                        
+                        # Log de sucesso
+                        file_size = len(file_data)
+                        print(f"[{timestamp}] ✅ Arquivo servido: {photo_path} ({file_size} bytes)")
+                        
+                    except Exception as e:
+                        print(f"[{timestamp}] ❌ Erro ao servir arquivo {photo_path}: {e}")
+                        self.send_error(500, f'Error reading file: {e}')
                 else:
+                    # Log detalhado do erro 404
+                    print(f"[{timestamp}] ❌ Arquivo não encontrado: {full_path}")
+                    print(f"[{timestamp}] 📁 Pasta Fotos: {FOTOS_DIR}")
+                    print(f"[{timestamp}] 🔍 Arquivo solicitado: {photo_path}")
+                    
+                    # Lista arquivos na pasta para debug
+                    if os.path.exists(FOTOS_DIR):
+                        try:
+                            files = os.listdir(FOTOS_DIR)
+                            avif_files = [f for f in files if f.lower().endswith('.avif')]
+                            print(f"[{timestamp}] 📋 Arquivos .avif na pasta: {avif_files}")
+                        except Exception as e:
+                            print(f"[{timestamp}] ❌ Erro ao listar pasta: {e}")
+                    
                     self.send_error(404, f'Photo not found: {full_path}')
                 return
 

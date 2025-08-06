@@ -19,7 +19,23 @@ class PhotoMosaic {
         this.currentPhotoIndex = 0;
         this.availablePhotos = [];
         
+        // Verifica suporte a AVIF
+        this.checkAVIFSupport();
+        
         this.init();
+    }
+    
+    checkAVIFSupport() {
+        const img = new Image();
+        img.onload = () => {
+            console.log('✅ Navegador suporta formato AVIF');
+            this.avifSupported = true;
+        };
+        img.onerror = () => {
+            console.warn('⚠️ Navegador NÃO suporta formato AVIF');
+            this.avifSupported = false;
+        };
+        img.src = 'data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADybWV0YQAAAAAAAAAoaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAGxpYmF2aWYAAAAADnBpdG0AAAAAAAEAAAAeaWxvYwAAAABEAAABAAEAAAABAAABGgAAAB0AAAAoaWluZgAAAAAAAQAAABppbmZlAgAAAAABAABhdjAxQ29sb3IAAAAAamlwcnAAAABLaXBjbwAAABRpc3BlAAAAAAAAAAEAAAABAAAAEHBpeGkAAAAAAwgICAAAAAxhdjFDgQ0MAAAAABNjb2xybmNseAACAAIAAYAAAAAXaXBtYQAAAAAAAAABAAEEAQKDBAAAACVtZGF0EgAKCBgABogQEAwgq8y8AAAARn42bAQUBQoIGAAmhBQcEAwgs8y8';
     }
     
     init() {
@@ -121,6 +137,9 @@ class PhotoMosaic {
                 ];
             }
             
+            // Filtra fotos baseado no suporte do navegador
+            this.filterPhotosByBrowserSupport();
+            
             if (this.availablePhotos.length === 0) {
                 this.updateStatus('Nenhuma foto encontrada');
                 return;
@@ -144,6 +163,42 @@ class PhotoMosaic {
             console.error('❌ Erro ao carregar fotos:', error);
             this.updateStatus('Erro ao carregar fotos');
         }
+    }
+    
+    filterPhotosByBrowserSupport() {
+        const originalCount = this.availablePhotos.length;
+        
+        if (this.avifSupported === false) {
+            // Remove arquivos AVIF se o navegador não suportar
+            this.availablePhotos = this.availablePhotos.filter(photo => 
+                !photo.toLowerCase().endsWith('.avif')
+            );
+            
+            const removedCount = originalCount - this.availablePhotos.length;
+            if (removedCount > 0) {
+                console.warn(`⚠️ Removidos ${removedCount} arquivos AVIF (navegador não suporta)`);
+            }
+        }
+        
+        console.log(`📸 Fotos disponíveis após filtro: ${this.availablePhotos.length}/${originalCount}`);
+    }
+    
+    filterPhotosBySupport(photos) {
+        if (this.avifSupported === false) {
+            // Remove arquivos AVIF se o navegador não suportar
+            const filtered = photos.filter(photo => 
+                !photo.toLowerCase().endsWith('.avif')
+            );
+            
+            const removedCount = photos.length - filtered.length;
+            if (removedCount > 0) {
+                console.warn(`⚠️ Filtrados ${removedCount} arquivos AVIF (navegador não suporta)`);
+            }
+            
+            return filtered;
+        }
+        
+        return photos;
     }
     
     addRandomPhoto() {
@@ -289,23 +344,73 @@ class PhotoMosaic {
         
         // Adiciona timestamp para evitar cache
         const timestamp = Date.now();
-        if (photoUrl.includes('?')) {
-            img.src = `${photoUrl}&t=${timestamp}`;
-        } else {
-            img.src = `${photoUrl}?t=${timestamp}`;
-        }
+        const finalUrl = photoUrl.includes('?') ? `${photoUrl}&t=${timestamp}` : `${photoUrl}?t=${timestamp}`;
+        
+        const fileName = photoUrl.split('/').pop();
+        console.log(`🔄 Tentando carregar: ${fileName}`);
         
         img.onload = () => {
-            console.log(`✅ Imagem carregada: ${photoUrl.split('/').pop()}`);
+            console.log(`✅ Imagem carregada com sucesso: ${fileName}`);
         };
         
-        img.onerror = () => {
+        img.onerror = (event) => {
             console.error(`❌ Erro ao carregar: ${photoUrl}`);
-            // Mostra imagem de erro simples
-            img.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzAwIiBoZWlnaHQ9IjMwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjMzMzIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iI2NjYyIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPkVycm88L3RleHQ+PC9zdmc+';
+            console.error(`📁 Arquivo: ${fileName}`);
+            console.error(`🔗 URL completa: ${finalUrl}`);
+            
+            // Se é um arquivo AVIF e o navegador não suporta, tenta converter
+            if (fileName.toLowerCase().endsWith('.avif') && this.avifSupported === false) {
+                console.warn(`⚠️ Navegador não suporta AVIF, tentando formato alternativo...`);
+                
+                // Tenta carregar uma versão convertida (se disponível)
+                const alternativeUrl = photoUrl.replace('.avif', '.jpg');
+                console.log(`🔄 Tentando formato alternativo: ${alternativeUrl}`);
+                
+                img.onerror = () => {
+                    this.showErrorImage(img, fileName, finalUrl);
+                };
+                
+                img.src = alternativeUrl;
+                return;
+            }
+            
+            // Tenta verificar se o arquivo existe fazendo uma requisição HEAD
+            fetch(photoUrl, { method: 'HEAD' })
+                .then(response => {
+                    if (response.ok) {
+                        console.log(`✅ Arquivo existe no servidor (${response.status})`);
+                        console.log(`📊 Tamanho: ${response.headers.get('content-length') || 'desconhecido'} bytes`);
+                    } else {
+                        console.error(`❌ Arquivo não encontrado no servidor (${response.status})`);
+                    }
+                })
+                .catch(error => {
+                    console.error(`❌ Erro ao verificar arquivo: ${error.message}`);
+                });
+            
+            this.showErrorImage(img, fileName, finalUrl);
         };
         
+        img.src = finalUrl;
         mosaicItem.appendChild(img);
+    }
+    
+    showErrorImage(img, fileName, retryUrl) {
+        // Mostra imagem de erro mais informativa
+        img.src = `data:image/svg+xml;base64,${btoa(`
+            <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+                <rect width="100%" height="100%" fill="#2c3e50"/>
+                <text x="50%" y="40%" font-family="Arial" font-size="16" fill="#ecf0f1" text-anchor="middle">Erro ao carregar</text>
+                <text x="50%" y="55%" font-family="Arial" font-size="12" fill="#bdc3c7" text-anchor="middle">${fileName}</text>
+                <text x="50%" y="70%" font-family="Arial" font-size="10" fill="#95a5a6" text-anchor="middle">Clique para tentar novamente</text>
+            </svg>
+        `)}`;
+        
+        // Adiciona evento de clique para tentar recarregar
+        img.onclick = () => {
+            console.log(`🔄 Tentando recarregar: ${fileName}`);
+            img.src = retryUrl;
+        };
     }
     
     replaceSinglePhoto(mosaicIndex, newPhotoUrl) {
@@ -381,10 +486,13 @@ class PhotoMosaic {
             if (response.ok) {
                 const newPhotos = await response.json();
                 
+                // Aplica filtro de suporte do navegador nas novas fotos
+                const filteredNewPhotos = this.filterPhotosBySupport(newPhotos);
+                
                 // Verifica se há mudanças (novas fotos ou mudança no total)
-                const hasChanges = newPhotos.length !== this.availablePhotos.length;
+                const hasChanges = filteredNewPhotos.length !== this.availablePhotos.length;
                 const currentPhotoNames = this.availablePhotos.map(p => p.split('/').pop());
-                const newPhotoNames = newPhotos.map(p => p.split('/').pop());
+                const newPhotoNames = filteredNewPhotos.map(p => p.split('/').pop());
                 const addedPhotos = newPhotoNames.filter(name => !currentPhotoNames.includes(name));
                 
                 const endTime = performance.now();
@@ -392,10 +500,10 @@ class PhotoMosaic {
                 
                 if (addedPhotos.length > 0 || hasChanges) {
                     console.log(`[${timestamp}] 🆕 Novas fotos detectadas em ${detectionTime.toFixed(1)}ms:`, addedPhotos);
-                    console.log(`[${timestamp}] 📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
+                    console.log(`[${timestamp}] 📊 Total de fotos: ${this.availablePhotos.length} → ${filteredNewPhotos.length}`);
                     
                     // Força atualização imediata se há mudanças
-                    this.addNewPhotosToMosaic(newPhotos, addedPhotos);
+                    this.addNewPhotosToMosaic(filteredNewPhotos, addedPhotos);
                 } else {
                     console.log(`[${timestamp}] 📁 Verificação concluída em ${detectionTime.toFixed(1)}ms: nenhuma nova foto`);
                 }
