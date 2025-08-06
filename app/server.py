@@ -133,15 +133,20 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
     def get_photos_from_directory_cached(self):
         # Sem cache - sempre lê a pasta diretamente
+        start_time = time.time()
         photos = []
+        
         if os.path.exists(FOTOS_DIR):
             for filename in os.listdir(FOTOS_DIR):
                 if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
                     photos.append(f'/Fotos/{filename}')
         
-        # Log para debug
-        timestamp = time.strftime("%H:%M:%S")
-        print(f"[{timestamp}] 📸 Detecção instantânea: {len(photos)} fotos encontradas")
+        end_time = time.time()
+        detection_time = (end_time - start_time) * 1000  # Convert to milliseconds
+        
+        # Log detalhado com timestamp
+        timestamp = time.strftime("%H:%M:%S.%f")[:-3]  # Include milliseconds
+        print(f"[{timestamp}] 📸 Detecção instantânea: {len(photos)} fotos em {detection_time:.1f}ms")
         
         return sorted(photos)
 

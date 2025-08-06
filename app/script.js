@@ -345,7 +345,14 @@ class PhotoMosaic {
     }
     
     async checkForNewPhotos() {
+        const startTime = performance.now();
+        const timestamp = new Date().toLocaleTimeString('pt-BR', { 
+            hour12: false, 
+            fractionalSecondDigits: 3 
+        });
+        
         try {
+            console.log(`[${timestamp}] 🔍 Iniciando verificação de novas fotos...`);
             const response = await fetch('/api/photos');
             if (response.ok) {
                 const newPhotos = await response.json();
@@ -356,23 +363,32 @@ class PhotoMosaic {
                 
                 const addedPhotos = newPhotoNames.filter(name => !currentPhotoNames.includes(name));
                 
+                const endTime = performance.now();
+                const detectionTime = endTime - startTime;
+                
                 if (addedPhotos.length > 0) {
-                    console.log('🆕 Novas fotos detectadas:', addedPhotos);
-                    console.log(`📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
+                    console.log(`[${timestamp}] 🆕 Novas fotos detectadas em ${detectionTime.toFixed(1)}ms:`, addedPhotos);
+                    console.log(`[${timestamp}] 📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
                     this.addNewPhotosToMosaic(newPhotos);
                 } else {
-                    console.log('📁 Verificação de novas fotos: nenhuma nova foto encontrada');
+                    console.log(`[${timestamp}] 📁 Verificação concluída em ${detectionTime.toFixed(1)}ms: nenhuma nova foto`);
                 }
             } else {
-                console.error('❌ Erro na resposta da API:', response.status);
+                console.error(`[${timestamp}] ❌ Erro na resposta da API:`, response.status);
             }
         } catch (error) {
-            console.error('❌ Erro ao verificar novas fotos:', error);
+            console.error(`[${timestamp}] ❌ Erro ao verificar novas fotos:`, error);
         }
     }
     
     addNewPhotosToMosaic(newPhotos) {
-        console.log('🔄 Atualizando lista de fotos disponíveis...');
+        const startTime = performance.now();
+        const timestamp = new Date().toLocaleTimeString('pt-BR', { 
+            hour12: false, 
+            fractionalSecondDigits: 3 
+        });
+        
+        console.log(`[${timestamp}] 🔄 Iniciando atualização de fotos...`);
         this.availablePhotos = newPhotos;
         
         // Encontra fotos que não estão no mosaico atual
@@ -380,7 +396,7 @@ class PhotoMosaic {
             !this.photos.includes(photo)
         );
         
-        console.log(`📸 ${availableNewPhotos.length} novas fotos disponíveis para adicionar`);
+        console.log(`[${timestamp}] 📸 ${availableNewPhotos.length} novas fotos disponíveis para adicionar`);
         
         if (availableNewPhotos.length > 0) {
             // Adiciona múltiplas fotos novas de uma vez
@@ -388,17 +404,23 @@ class PhotoMosaic {
             
             // Força atualização imediata do mosaico
             setTimeout(() => {
+                const displayStartTime = performance.now();
+                
                 for (let i = 0; i < photosToAdd; i++) {
                     const newPhoto = availableNewPhotos[i];
                     const randomIndex = Math.floor(Math.random() * 4);
                     
-                    console.log(`➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
+                    console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
                     this.replaceSinglePhoto(randomIndex, newPhoto);
                     this.photos[randomIndex] = newPhoto;
                 }
                 
+                const displayEndTime = performance.now();
+                const displayTime = displayEndTime - displayStartTime;
+                const totalTime = displayEndTime - startTime;
+                
                 this.updateStatus(`${photosToAdd} novas fotos adicionadas!`);
-                console.log(`✅ ${photosToAdd} novas fotos adicionadas ao mosaico`);
+                console.log(`[${timestamp}] ✅ ${photosToAdd} novas fotos exibidas em ${displayTime.toFixed(1)}ms (total: ${totalTime.toFixed(1)}ms)`);
             }, 100); // Pequeno delay para garantir que as mudanças sejam visíveis
         }
     }
