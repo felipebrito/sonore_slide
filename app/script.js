@@ -397,24 +397,37 @@ class PhotoMosaic {
         
         // Tenta carregar uma imagem aleatória da lista disponível
         if (this.availablePhotos.length > 0) {
-            const randomPhoto = this.availablePhotos[Math.floor(Math.random() * this.availablePhotos.length)];
-            const randomFileName = randomPhoto.split('/').pop();
+            // Filtra imagens que não estão atualmente no mosaico
+            const currentPhotoNames = this.photos.map(p => p.split('/').pop());
+            const availablePhotos = this.availablePhotos.filter(photo => {
+                const photoName = photo.split('/').pop();
+                return !currentPhotoNames.includes(photoName);
+            });
             
-            console.log(`🔄 Tentativa ${this.retryCount}/3: carregando imagem aleatória: ${randomFileName}`);
-            
-            // Remove eventos de erro anteriores
-            img.onerror = null;
-            
-            // Adiciona novo evento de erro
-            img.onerror = () => {
-                console.warn(`⚠️ Falha na tentativa ${this.retryCount}/3: ${randomFileName}`);
-                this.loadRandomImage(img, mosaicItem);
-            };
-            
-            // Carrega a nova imagem
-            const timestamp = Date.now();
-            const finalUrl = randomPhoto.includes('?') ? `${randomPhoto}&t=${timestamp}` : `${randomPhoto}?t=${timestamp}`;
-            img.src = finalUrl;
+            if (availablePhotos.length > 0) {
+                const randomPhoto = availablePhotos[Math.floor(Math.random() * availablePhotos.length)];
+                const randomFileName = randomPhoto.split('/').pop();
+                
+                console.log(`🔄 Tentativa ${this.retryCount}/3: carregando imagem aleatória: ${randomFileName}`);
+                
+                // Remove eventos de erro anteriores
+                img.onerror = null;
+                
+                // Adiciona novo evento de erro
+                img.onerror = () => {
+                    console.warn(`⚠️ Falha na tentativa ${this.retryCount}/3: ${randomFileName}`);
+                    this.loadRandomImage(img, mosaicItem);
+                };
+                
+                // Carrega a nova imagem
+                const timestamp = Date.now();
+                const finalUrl = randomPhoto.includes('?') ? `${randomPhoto}&t=${timestamp}` : `${randomPhoto}?t=${timestamp}`;
+                img.src = finalUrl;
+            } else {
+                console.warn(`⚠️ Todas as imagens já estão no mosaico`);
+                this.retryCount = 0;
+                this.showErrorImage(img, 'Todas as imagens já exibidas', '');
+            }
         } else {
             console.warn(`⚠️ Nenhuma imagem disponível na lista`);
             this.retryCount = 0;
@@ -568,21 +581,25 @@ class PhotoMosaic {
         console.log(`[${timestamp}] 🔄 Iniciando atualização de fotos...`);
         this.availablePhotos = newPhotos;
         
-        // Se não há fotos novas específicas, usa todas as fotos disponíveis
-        const photosToProcess = addedPhotos.length > 0 ? addedPhotos : newPhotos;
-        
-        console.log(`[${timestamp}] 📸 ${photosToProcess.length} fotos disponíveis para adicionar`);
-        
-        if (photosToProcess.length > 0) {
-            // Adiciona até 4 novas fotos ao mosaico IMEDIATAMENTE
-            const photosToAdd = Math.min(photosToProcess.length, 4);
+        // Se há fotos novas específicas, adiciona apenas elas
+        if (addedPhotos.length > 0) {
+            console.log(`[${timestamp}] 📸 ${addedPhotos.length} novas fotos para adicionar:`, addedPhotos.map(p => p.split('/').pop()));
             
             const displayStartTime = performance.now();
             
-            // Substitui posições aleatórias com novas fotos IMEDIATAMENTE
-            for (let i = 0; i < photosToAdd; i++) {
-                const newPhoto = photosToProcess[i];
-                const randomIndex = Math.floor(Math.random() * 4);
+            // Adiciona cada nova foto em uma posição diferente
+            const usedPositions = new Set();
+            
+            for (let i = 0; i < Math.min(addedPhotos.length, 4); i++) {
+                const newPhoto = addedPhotos[i];
+                
+                // Encontra uma posição não usada
+                let randomIndex;
+                do {
+                    randomIndex = Math.floor(Math.random() * 4);
+                } while (usedPositions.has(randomIndex));
+                
+                usedPositions.add(randomIndex);
                 
                 console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
                 this.replaceSinglePhoto(randomIndex, newPhoto);
@@ -593,8 +610,10 @@ class PhotoMosaic {
             const displayTime = displayEndTime - displayStartTime;
             const totalTime = displayEndTime - startTime;
             
-            this.updateStatus(`${photosToAdd} novas fotos adicionadas!`);
-            console.log(`[${timestamp}] ✅ ${photosToAdd} novas fotos exibidas em ${displayTime.toFixed(1)}ms (total: ${totalTime.toFixed(1)}ms)`);
+            this.updateStatus(`${addedPhotos.length} novas fotos adicionadas!`);
+            console.log(`[${timestamp}] ✅ ${addedPhotos.length} novas fotos exibidas em ${displayTime.toFixed(1)}ms (total: ${totalTime.toFixed(1)}ms)`);
+        } else {
+            console.log(`[${timestamp}] ℹ️ Nenhuma foto nova específica para adicionar`);
         }
     }
     
