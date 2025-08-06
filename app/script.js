@@ -3,10 +3,10 @@ class PhotoMosaic {
         this.mosaic = document.getElementById('mosaic');
         this.status = document.getElementById('status');
         
-        // Configurações
+        // Configurações - Intervalos mais agressivos para detecção rápida
         this.config = {
             rotationInterval: 15000, // 15 segundos
-            checkInterval: 30000,    // 30 segundos
+            checkInterval: 5000,     // 5 segundos (era 30 segundos)
         };
         
         // Timers
@@ -340,11 +340,25 @@ class PhotoMosaic {
     startFolderMonitoring() {
         this.stopFolderMonitoring();
         
+        // Primeira verificação imediata
+        this.checkForNewPhotos();
+        
+        // Verificação inicial mais frequente (primeiros 30 segundos)
+        let initialChecks = 0;
+        const initialInterval = setInterval(() => {
+            this.checkForNewPhotos();
+            initialChecks++;
+            if (initialChecks >= 6) { // 6 verificações em 30 segundos
+                clearInterval(initialInterval);
+            }
+        }, 5000); // A cada 5 segundos
+        
+        // Monitoramento regular
         this.checkTimer = setInterval(() => {
             this.checkForNewPhotos();
         }, this.config.checkInterval);
         
-        console.log(`📁 Monitoramento de pasta iniciado: ${this.config.checkInterval}ms`);
+        console.log(`📁 Monitoramento de pasta iniciado: ${this.config.checkInterval}ms (verificação inicial a cada 5s)`);
     }
     
     stopFolderMonitoring() {
@@ -367,18 +381,20 @@ class PhotoMosaic {
             if (response.ok) {
                 const newPhotos = await response.json();
                 
-                // Verifica se há novas fotos ou se o total mudou
+                // Verifica se há mudanças (novas fotos ou mudança no total)
+                const hasChanges = newPhotos.length !== this.availablePhotos.length;
                 const currentPhotoNames = this.availablePhotos.map(p => p.split('/').pop());
                 const newPhotoNames = newPhotos.map(p => p.split('/').pop());
-                
                 const addedPhotos = newPhotoNames.filter(name => !currentPhotoNames.includes(name));
                 
                 const endTime = performance.now();
                 const detectionTime = endTime - startTime;
                 
-                if (addedPhotos.length > 0 || newPhotos.length !== this.availablePhotos.length) {
+                if (addedPhotos.length > 0 || hasChanges) {
                     console.log(`[${timestamp}] 🆕 Novas fotos detectadas em ${detectionTime.toFixed(1)}ms:`, addedPhotos);
                     console.log(`[${timestamp}] 📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
+                    
+                    // Força atualização imediata se há mudanças
                     this.addNewPhotosToMosaic(newPhotos, addedPhotos);
                 } else {
                     console.log(`[${timestamp}] 📁 Verificação concluída em ${detectionTime.toFixed(1)}ms: nenhuma nova foto`);
@@ -407,30 +423,27 @@ class PhotoMosaic {
         console.log(`[${timestamp}] 📸 ${photosToProcess.length} fotos disponíveis para adicionar`);
         
         if (photosToProcess.length > 0) {
-            // Adiciona até 4 novas fotos ao mosaico
+            // Adiciona até 4 novas fotos ao mosaico IMEDIATAMENTE
             const photosToAdd = Math.min(photosToProcess.length, 4);
             
-            // Força atualização imediata do mosaico
-            setTimeout(() => {
-                const displayStartTime = performance.now();
+            const displayStartTime = performance.now();
+            
+            // Substitui posições aleatórias com novas fotos IMEDIATAMENTE
+            for (let i = 0; i < photosToAdd; i++) {
+                const newPhoto = photosToProcess[i];
+                const randomIndex = Math.floor(Math.random() * 4);
                 
-                // Substitui posições aleatórias com novas fotos
-                for (let i = 0; i < photosToAdd; i++) {
-                    const newPhoto = photosToProcess[i];
-                    const randomIndex = Math.floor(Math.random() * 4);
-                    
-                    console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
-                    this.replaceSinglePhoto(randomIndex, newPhoto);
-                    this.photos[randomIndex] = newPhoto;
-                }
-                
-                const displayEndTime = performance.now();
-                const displayTime = displayEndTime - displayStartTime;
-                const totalTime = displayEndTime - startTime;
-                
-                this.updateStatus(`${photosToAdd} novas fotos adicionadas!`);
-                console.log(`[${timestamp}] ✅ ${photosToAdd} novas fotos exibidas em ${displayTime.toFixed(1)}ms (total: ${totalTime.toFixed(1)}ms)`);
-            }, 100); // Pequeno delay para garantir que as mudanças sejam visíveis
+                console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
+                this.replaceSinglePhoto(randomIndex, newPhoto);
+                this.photos[randomIndex] = newPhoto;
+            }
+            
+            const displayEndTime = performance.now();
+            const displayTime = displayEndTime - displayStartTime;
+            const totalTime = displayEndTime - startTime;
+            
+            this.updateStatus(`${photosToAdd} novas fotos adicionadas!`);
+            console.log(`[${timestamp}] ✅ ${photosToAdd} novas fotos exibidas em ${displayTime.toFixed(1)}ms (total: ${totalTime.toFixed(1)}ms)`);
         }
     }
     
