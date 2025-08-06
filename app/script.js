@@ -369,7 +369,7 @@ class PhotoMosaic {
                 if (addedPhotos.length > 0) {
                     console.log(`[${timestamp}] 🆕 Novas fotos detectadas em ${detectionTime.toFixed(1)}ms:`, addedPhotos);
                     console.log(`[${timestamp}] 📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
-                    this.addNewPhotosToMosaic(newPhotos);
+                    this.addNewPhotosToMosaic(newPhotos, addedPhotos);
                 } else {
                     console.log(`[${timestamp}] 📁 Verificação concluída em ${detectionTime.toFixed(1)}ms: nenhuma nova foto`);
                 }
@@ -381,7 +381,7 @@ class PhotoMosaic {
         }
     }
     
-    addNewPhotosToMosaic(newPhotos) {
+    addNewPhotosToMosaic(newPhotos, addedPhotos = []) {
         const startTime = performance.now();
         const timestamp = new Date().toLocaleTimeString('pt-BR', { 
             hour12: false, 
@@ -391,16 +391,14 @@ class PhotoMosaic {
         console.log(`[${timestamp}] 🔄 Iniciando atualização de fotos...`);
         this.availablePhotos = newPhotos;
         
-        // Encontra fotos que não estão no mosaico atual
-        const availableNewPhotos = newPhotos.filter(photo => 
-            !this.photos.includes(photo)
-        );
+        // Usa apenas as fotos que foram realmente detectadas como novas
+        const actualNewPhotos = addedPhotos.length > 0 ? addedPhotos : [];
         
-        console.log(`[${timestamp}] 📸 ${availableNewPhotos.length} novas fotos disponíveis para adicionar`);
+        console.log(`[${timestamp}] 📸 ${actualNewPhotos.length} novas fotos para adicionar:`, actualNewPhotos);
         
-        if (availableNewPhotos.length > 0) {
-            // Adiciona apenas as novas fotos, respeitando ordem de adição
-            const photosToAdd = Math.min(availableNewPhotos.length, 4);
+        if (actualNewPhotos.length > 0) {
+            // Adiciona apenas as fotos realmente novas
+            const photosToAdd = Math.min(actualNewPhotos.length, 4);
             
             // Força atualização imediata do mosaico
             setTimeout(() => {
@@ -408,7 +406,7 @@ class PhotoMosaic {
                 
                 // Substitui apenas as posições necessárias com novas fotos
                 for (let i = 0; i < photosToAdd; i++) {
-                    const newPhoto = availableNewPhotos[i];
+                    const newPhoto = actualNewPhotos[i];
                     const randomIndex = Math.floor(Math.random() * 4);
                     
                     console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
