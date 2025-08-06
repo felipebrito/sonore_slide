@@ -29,10 +29,10 @@ if errorlevel 1 (
 
 echo.
 echo [INFO] Verificando estrutura de arquivos...
-if exist "app\server.py" (
-    echo [OK] app\server.py encontrado
+if exist "app\server_windows_fixed.py" (
+    echo [OK] app\server_windows_fixed.py encontrado (versao Windows)
 ) else (
-    echo [ERRO] app\server.py nao encontrado!
+    echo [ERRO] app\server_windows_fixed.py nao encontrado!
     pause
     exit /b 1
 )
@@ -83,7 +83,7 @@ echo.
 echo [INFO] Pressione qualquer tecla para iniciar o servidor...
 pause >nul
 
-%PYTHON_CMD% app\server.py
+%PYTHON_CMD% app\server_windows_fixed.py
 
 echo.
 echo [INFO] Servidor parado.

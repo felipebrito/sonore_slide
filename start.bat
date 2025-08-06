@@ -23,9 +23,9 @@ if errorlevel 1 (
 echo OK: Python encontrado
 echo.
 
-echo 2. Iniciando servidor universal...
+echo 2. Iniciando servidor Windows otimizado...
 echo URL: http://localhost:5000
-echo Para parar: Ctrl+C
+echo Para parar: Ctrl+C (agora funciona!)
 echo.
 echo [INFO] Aguardando 3 segundos antes de abrir o navegador...
 timeout /t 3 /nobreak >nul
@@ -35,7 +35,7 @@ echo [INFO] 1. Aguarde alguns segundos
 echo [INFO] 2. Recarregue a pagina (F5)
 echo [INFO] 3. Tente acessar manualmente: http://localhost:5000
 echo.
-python app\server.py
+python app\server_windows_fixed.py
 
 echo.
 echo OK: Servidor parado com sucesso!

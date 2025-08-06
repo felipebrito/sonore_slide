@@ -11,6 +11,7 @@ start.bat
 - O script verifica se o Python está instalado
 - Se não estiver, abre o site de download automaticamente
 - Depois de instalar, execute novamente o `start.bat`
+- **Ctrl+C agora funciona corretamente para parar o servidor**
 
 ### Mac/Linux
 ```
@@ -31,7 +32,8 @@ python3 app/server.py
 ```
 Slide/
 ├── app/
-│   ├── server.py                   # ✅ Servidor universal (Windows/Mac)
+│   ├── server.py                   # ✅ Servidor universal (Mac/Linux)
+│   ├── server_windows_fixed.py     # ✅ Servidor Windows otimizado
 │   ├── index.html                  # ✅ Interface principal
 │   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
@@ -93,6 +95,8 @@ sudo yum install python3
 
 ## 🔄 Versões
 
+- **v4.2** - Ctrl+C funcionando no Windows
+- **v4.1** - Scripts de debug para Windows
 - **v4.0** - Estrutura limpa e universal
 - **v3.1** - Iniciador universal com verificação de Python
 - **v3.0** - Servidor universal multiplataforma
@@ -102,5 +106,5 @@ sudo yum install python3
 
 ---
 
-**Versão:** 4.0 - Estrutura limpa e universal  
+**Versão:** 4.2 - Ctrl+C funcionando no Windows  
 **Status:** ✅ Funcional no Windows e Mac 
