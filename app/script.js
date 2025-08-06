@@ -3,10 +3,10 @@ class PhotoMosaic {
         this.mosaic = document.getElementById('mosaic');
         this.status = document.getElementById('status');
         
-        // Configurações - Intervalos mais agressivos para detecção rápida
+        // Configurações - Intervalos mais estáveis
         this.config = {
             rotationInterval: 15000, // 15 segundos
-            checkInterval: 5000,     // 5 segundos (era 30 segundos)
+            checkInterval: 15000,    // 15 segundos (era 5 segundos)
         };
         
         // Timers
@@ -343,22 +343,12 @@ class PhotoMosaic {
         // Primeira verificação imediata
         this.checkForNewPhotos();
         
-        // Verificação inicial mais frequente (primeiros 30 segundos)
-        let initialChecks = 0;
-        const initialInterval = setInterval(() => {
-            this.checkForNewPhotos();
-            initialChecks++;
-            if (initialChecks >= 6) { // 6 verificações em 30 segundos
-                clearInterval(initialInterval);
-            }
-        }, 5000); // A cada 5 segundos
-        
-        // Monitoramento regular
+        // Monitoramento regular mais estável
         this.checkTimer = setInterval(() => {
             this.checkForNewPhotos();
         }, this.config.checkInterval);
         
-        console.log(`📁 Monitoramento de pasta iniciado: ${this.config.checkInterval}ms (verificação inicial a cada 5s)`);
+        console.log(`📁 Monitoramento de pasta iniciado: ${this.config.checkInterval}ms`);
     }
     
     stopFolderMonitoring() {
@@ -377,7 +367,17 @@ class PhotoMosaic {
         
         try {
             console.log(`[${timestamp}] 🔍 Iniciando verificação de novas fotos...`);
-            const response = await fetch('/api/photos');
+            
+            // Timeout para evitar travamentos
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 segundos timeout
+            
+            const response = await fetch('/api/photos', {
+                signal: controller.signal
+            });
+            
+            clearTimeout(timeoutId);
+            
             if (response.ok) {
                 const newPhotos = await response.json();
                 
@@ -403,7 +403,11 @@ class PhotoMosaic {
                 console.error(`[${timestamp}] ❌ Erro na resposta da API:`, response.status);
             }
         } catch (error) {
-            console.error(`[${timestamp}] ❌ Erro ao verificar novas fotos:`, error);
+            if (error.name === 'AbortError') {
+                console.error(`[${timestamp}] ⏰ Timeout na verificação de fotos`);
+            } else {
+                console.error(`[${timestamp}] ❌ Erro ao verificar novas fotos:`, error);
+            }
         }
     }
     

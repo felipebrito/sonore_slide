@@ -45,127 +45,135 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         timestamp = time.strftime("%H:%M:%S")
         print(f"[{timestamp}] 🌐 Requisição recebida: {self.path}")
         
-        # Redirecionar raiz para a aplicação
-        if self.path == '/':
-            self.send_response(302)
-            self.send_header('Location', '/index.html')
-            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Expires', '0')
-            self.end_headers()
-            return
-
-        # Handler para Service Worker (evita 404)
-        if self.path == '/sw.js':
-            self.send_response(404)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            return
-
-        # API para listar fotos (com cache)
-        if self.path == '/api/photos':
-            timestamp = time.strftime("%H:%M:%S")
-            print(f"[{timestamp}] 📡 Processando requisição /api/photos")
-            
-            try:
-                photos = self.get_photos_from_directory_cached()
-                
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sem cache
+        try:
+            # Redirecionar raiz para a aplicação
+            if self.path == '/':
+                self.send_response(302)
+                self.send_header('Location', '/index.html')
+                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
                 self.send_header('Pragma', 'no-cache')
                 self.send_header('Expires', '0')
                 self.end_headers()
+                return
 
-                response_data = json.dumps(photos)
-                self.wfile.write(response_data.encode('utf-8'))
-                
-                # Log para debug
-                print(f"[{timestamp}] ✅ API /api/photos: {len(photos)} fotos retornadas ({len(response_data)} bytes)")
-                
-            except Exception as e:
-                print(f"[{timestamp}] ❌ Erro na API /api/photos: {e}")
-                self.send_response(500)
-                self.send_header('Content-type', 'application/json')
+            # Handler para Service Worker (evita 404)
+            if self.path == '/sw.js':
+                self.send_response(404)
+                self.send_header('Content-type', 'text/plain')
                 self.end_headers()
-                error_response = json.dumps({"error": str(e)})
-                self.wfile.write(error_response.encode('utf-8'))
-            return
+                return
 
-        # Servir fotos da pasta Fotos/
-        elif self.path.startswith('/Fotos/'):
-            from urllib.parse import unquote
-            photo_path = unquote(self.path[7:])  # Remove '/Fotos/' prefix e decodifica URL
-            full_path = os.path.join(FOTOS_DIR, photo_path)
-
-            if os.path.exists(full_path) and os.path.isfile(full_path):
-                self.send_response(200)
+            # API para listar fotos (com cache)
+            if self.path == '/api/photos':
+                timestamp = time.strftime("%H:%M:%S")
+                print(f"[{timestamp}] 📡 Processando requisição /api/photos")
                 
-                # Detecção específica de MIME types para AVIF e outros formatos
-                content_type = None
-                if full_path.lower().endswith('.avif'):
-                    content_type = 'image/avif'
-                elif full_path.lower().endswith('.webp'):
-                    content_type = 'image/webp'
-                elif full_path.lower().endswith('.png'):
-                    content_type = 'image/png'
-                elif full_path.lower().endswith(('.jpg', '.jpeg')):
-                    content_type = 'image/jpeg'
-                elif full_path.lower().endswith('.gif'):
-                    content_type = 'image/gif'
-                else:
-                    content_type, _ = mimetypes.guess_type(full_path)
-                
-                if content_type:
-                    self.send_header('Content-type', content_type)
-                
-                # Headers específicos para AVIF
-                if full_path.lower().endswith('.avif'):
-                    self.send_header('Accept', 'image/avif,image/webp,image/jpeg,image/png')
-                    self.send_header('Vary', 'Accept')
-                
-                # Headers para cache de imagens
-                self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
-                self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
-                self.send_header('Access-Control-Allow-Origin', '*')
-                self.end_headers()
-                
-                with open(full_path, 'rb') as f:
-                    self.wfile.write(f.read())
-            else:
-                self.send_error(404, f'Photo not found: {full_path}')
-            return
-
-        # Servir arquivos estáticos da pasta app
-        elif self.path.startswith('/'):
-            file_path = os.path.join(APP_DIR, self.path.lstrip('/'))
-            if os.path.exists(file_path) and os.path.isfile(file_path):
-                self.send_response(200)
-                content_type, _ = mimetypes.guess_type(file_path)
-                if content_type:
-                    self.send_header('Content-type', content_type)
-                
-                # Cache diferente para arquivos estáticos
-                if file_path.endswith('.css'):
-                    self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
-                elif file_path.endswith('.js'):
-                    self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
-                elif file_path.endswith('.html'):
-                    self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sempre atual
+                try:
+                    photos = self.get_photos_from_directory_cached()
+                    
+                    self.send_response(200)
+                    self.send_header('Content-type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                    self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                    self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sem cache
                     self.send_header('Pragma', 'no-cache')
                     self.send_header('Expires', '0')
+                    self.end_headers()
+
+                    response_data = json.dumps(photos)
+                    self.wfile.write(response_data.encode('utf-8'))
+                    
+                    # Log para debug
+                    print(f"[{timestamp}] ✅ API /api/photos: {len(photos)} fotos retornadas ({len(response_data)} bytes)")
+                    
+                except Exception as e:
+                    print(f"[{timestamp}] ❌ Erro na API /api/photos: {e}")
+                    self.send_response(500)
+                    self.send_header('Content-type', 'application/json')
+                    self.end_headers()
+                    error_response = json.dumps({"error": str(e)})
+                    self.wfile.write(error_response.encode('utf-8'))
+                return
+
+            # Servir fotos da pasta Fotos/
+            elif self.path.startswith('/Fotos/'):
+                from urllib.parse import unquote
+                photo_path = unquote(self.path[7:])  # Remove '/Fotos/' prefix e decodifica URL
+                full_path = os.path.join(FOTOS_DIR, photo_path)
+
+                if os.path.exists(full_path) and os.path.isfile(full_path):
+                    self.send_response(200)
+                    
+                    # Detecção específica de MIME types para AVIF e outros formatos
+                    content_type = None
+                    if full_path.lower().endswith('.avif'):
+                        content_type = 'image/avif'
+                    elif full_path.lower().endswith('.webp'):
+                        content_type = 'image/webp'
+                    elif full_path.lower().endswith('.png'):
+                        content_type = 'image/png'
+                    elif full_path.lower().endswith(('.jpg', '.jpeg')):
+                        content_type = 'image/jpeg'
+                    elif full_path.lower().endswith('.gif'):
+                        content_type = 'image/gif'
+                    else:
+                        content_type, _ = mimetypes.guess_type(full_path)
+                    
+                    if content_type:
+                        self.send_header('Content-type', content_type)
+                    
+                    # Headers específicos para AVIF
+                    if full_path.lower().endswith('.avif'):
+                        self.send_header('Accept', 'image/avif,image/webp,image/jpeg,image/png')
+                        self.send_header('Vary', 'Accept')
+                    
+                    # Headers para cache de imagens
+                    self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
+                    self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    
+                    with open(full_path, 'rb') as f:
+                        self.wfile.write(f.read())
+                else:
+                    self.send_error(404, f'Photo not found: {full_path}')
+                return
+
+            # Servir arquivos estáticos da pasta app
+            elif self.path.startswith('/'):
+                file_path = os.path.join(APP_DIR, self.path.lstrip('/'))
+                if os.path.exists(file_path) and os.path.isfile(file_path):
+                    self.send_response(200)
+                    content_type, _ = mimetypes.guess_type(file_path)
+                    if content_type:
+                        self.send_header('Content-type', content_type)
+                    
+                    # Cache diferente para arquivos estáticos
+                    if file_path.endswith('.css'):
+                        self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
+                    elif file_path.endswith('.js'):
+                        self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
+                    elif file_path.endswith('.html'):
+                        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sempre atual
+                        self.send_header('Pragma', 'no-cache')
+                        self.send_header('Expires', '0')
+                    
+                    self.end_headers()
+                    with open(file_path, 'rb') as f:
+                        self.wfile.write(f.read())
+                else:
+                    self.send_response(302)
+                    self.send_header('Location', '/index.html')
+                    self.end_headers()
+                return
                 
-                self.end_headers()
-                with open(file_path, 'rb') as f:
-                    self.wfile.write(f.read())
-            else:
-                self.send_response(302)
-                self.send_header('Location', '/index.html')
-                self.end_headers()
-            return
+        except Exception as e:
+            print(f"[{timestamp}] ❌ Erro ao processar requisição: {e}")
+            try:
+                self.send_error(500, f'Internal server error: {e}')
+            except:
+                pass  # Ignora erros de conexão já fechada
 
     def do_OPTIONS(self):
         self.send_response(200)
