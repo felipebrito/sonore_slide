@@ -94,9 +94,9 @@ if not errorlevel 1 (
 :: Testar servidor
 echo.
 echo [6/6] Testando servidor...
-echo [INFO] Iniciando servidor de teste...
+echo [INFO] Iniciando servidor...
 start /min python app\server.py
-timeout /t 3 /nobreak >nul
+timeout /t 5 /nobreak >nul
 
 :: Verificar se o servidor está respondendo
 curl -s -o nul -w "%%{http_code}" http://localhost:5000 > temp_status.txt 2>nul
@@ -110,10 +110,6 @@ if "!status!"=="302" (
     echo [INFO] Continuando mesmo assim...
 )
 
-:: Parar servidor de teste
-taskkill /f /im python.exe >nul 2>&1
-timeout /t 1 /nobreak >nul
-
 echo.
 echo ========================================
 echo    TODAS AS VERIFICACOES CONCLUIDAS!
@@ -121,7 +117,7 @@ echo ========================================
 echo.
 echo [SUCESSO] Sistema pronto para uso!
 echo.
-echo [INFO] Iniciando Photo Mosaic...
+echo [INFO] Photo Mosaic iniciado!
 echo [INFO] URL: http://localhost:5000
 echo [INFO] Para parar: Ctrl+C
 echo.
@@ -131,9 +127,11 @@ timeout /t 3 /nobreak >nul
 :: Abrir navegador
 start http://localhost:5000
 
-:: Iniciar servidor
-echo [INFO] Iniciando servidor...
-python app\server.py
+:: Aguardar o usuário parar o servidor
+echo.
+echo [INFO] Servidor rodando. Pressione Ctrl+C para parar.
+echo.
+pause
 
 echo.
 echo [INFO] Photo Mosaic finalizado.
