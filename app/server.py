@@ -42,7 +42,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
             print(f"[{timestamp}] {message}")
 
     def do_GET(self):
-        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+        timestamp = time.strftime("%H:%M:%S")
         print(f"[{timestamp}] 🌐 Requisição recebida: {self.path}")
         
         # Redirecionar raiz para a aplicação
@@ -64,7 +64,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
         # API para listar fotos (com cache)
         if self.path == '/api/photos':
-            timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+            timestamp = time.strftime("%H:%M:%S")
             print(f"[{timestamp}] 📡 Processando requisição /api/photos")
             
             try:
@@ -156,7 +156,7 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         start_time = time.time()
         photos = []
         
-        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+        timestamp = time.strftime("%H:%M:%S")
         print(f"[{timestamp}] 🔍 Iniciando leitura da pasta: {FOTOS_DIR}")
         
         if os.path.exists(FOTOS_DIR):
