@@ -1,43 +1,75 @@
 @echo off
+chcp 65001 >nul
 setlocal enabledelayedexpansion
 
+echo.
 echo ========================================
-echo    PHOTO MOSAIC - INICIADOR UNIVERSAL
-
+echo    PHOTO MOSAIC - WIZARD SIMPLES
 echo ========================================
 echo.
 
-echo 1. Verificando Python...
+:: Verificar Python
+echo [1/4] Verificando Python...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ERRO: Python nao encontrado!
-    echo.
-    echo Abrindo site para download do Python...
+    echo [ERRO] Python nao encontrado!
+    echo [INFO] Abrindo site de download...
     start https://www.python.org/downloads/
-    echo.
-    echo Por favor, instale o Python e marque a opcao "Add Python to PATH".
-    echo Depois feche esta janela e execute novamente este arquivo.
     pause
     exit /b 1
 )
-echo OK: Python encontrado
-echo.
+echo [OK] Python encontrado
 
-echo 2. Iniciando servidor Windows otimizado...
-echo URL: http://localhost:5000
-echo Para parar: Ctrl+C (agora funciona!)
+:: Verificar arquivos
 echo.
-echo [INFO] Aguardando 2 segundos antes de abrir o navegador...
+echo [2/4] Verificando arquivos...
+if not exist "app\server.py" (
+    echo [ERRO] app\server.py nao encontrado!
+    pause
+    exit /b 1
+)
+if not exist "app\index.html" (
+    echo [ERRO] app\index.html nao encontrado!
+    pause
+    exit /b 1
+)
+echo [OK] Arquivos encontrados
+
+:: Verificar fotos
+echo.
+echo [3/4] Verificando fotos...
+set "photo_count=0"
+for %%f in (Fotos\*.jpg Fotos\*.jpeg Fotos\*.png Fotos\*.gif Fotos\*.webp) do set /a photo_count+=1
+echo [OK] !photo_count! fotos encontradas
+
+:: Liberar porta
+echo.
+echo [4/4] Liberando porta 5000...
+netstat -an | find "5000" >nul 2>&1
+if not errorlevel 1 (
+    echo [INFO] Liberando porta 5000...
+    for /f "tokens=5" %%a in ('netstat -ano ^| find "5000"') do (
+        taskkill /f /pid %%a >nul 2>&1
+    )
+    timeout /t 2 /nobreak >nul
+)
+echo [OK] Porta 5000 disponivel
+
+echo.
+echo ========================================
+echo    INICIANDO PHOTO MOSAIC
+echo ========================================
+echo.
+echo [INFO] URL: http://localhost:5000
+echo [INFO] Para parar: Ctrl+C
+echo.
+echo [INFO] Aguardando 2 segundos...
 timeout /t 2 /nobreak >nul
+
+:: Abrir navegador e iniciar servidor
 start http://localhost:5000
-echo [INFO] Navegador aberto. Se a pagina nao carregar:
-echo [INFO] 1. Aguarde alguns segundos
-echo [INFO] 2. Recarregue a pagina (F5)
-echo [INFO] 3. Tente acessar manualmente: http://localhost:5000
-echo.
 python app\server.py
 
 echo.
-echo OK: Servidor parado com sucesso!
-echo FIM: Photo Mosaic finalizado.
+echo [INFO] Photo Mosaic finalizado.
 pause 

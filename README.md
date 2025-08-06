@@ -4,22 +4,13 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 ## 🚀 Como Usar
 
-### Windows (Recomendado)
-
-#### Wizard de Inicialização (Recomendado)
+### Windows
 ```
-wizard_simples.bat
+start.bat
 ```
 - Verifica automaticamente todos os requisitos
 - Instala Python se necessário
 - **Carregamento otimizado** - Abre mais rapidamente
-- Abre o navegador automaticamente
-
-#### Iniciador Rápido
-```
-start.bat
-```
-- Inicia diretamente o servidor otimizado
 - Abre o navegador automaticamente
 - **Ctrl+C funciona corretamente para parar o servidor**
 
@@ -43,8 +34,7 @@ Slide/
 │   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── wizard_simples.bat              # ✅ Wizard otimizado
-├── start.bat                       # ✅ Iniciador rápido
+├── start.bat                       # ✅ Iniciador universal
 └── README.md                       # ✅ Este arquivo
 ```
 
@@ -76,7 +66,7 @@ Slide/
 ## 🛠️ Troubleshooting
 
 ### Windows - Se aparecer erro de comando não reconhecido:
-1. **Use:** `wizard_simples.bat` (verifica tudo automaticamente)
+1. **Use:** `start.bat` (verifica tudo automaticamente)
 
 ### Windows - Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -107,6 +97,7 @@ sudo yum install python3
 
 ## 🔄 Versões
 
+- **v6.1** - Estrutura simplificada - Apenas um arquivo .bat
 - **v6.0** - Estrutura limpa e servidor otimizado
 - **v5.1** - Corrige wizard - Não para o servidor de teste
 - **v5.0** - Estrutura limpa e wizard completo
@@ -123,5 +114,5 @@ sudo yum install python3
 
 ---
 
-**Versão:** 6.0 - Estrutura limpa e servidor otimizado  
+**Versão:** 6.1 - Estrutura simplificada - Apenas um arquivo .bat  
 **Status:** ✅ Funcional no Windows e Mac 
