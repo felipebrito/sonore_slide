@@ -188,10 +188,13 @@ def signal_handler(signum, frame):
     try:
         if hasattr(signal_handler, 'server'):
             signal_handler.server.shutdown()
+            signal_handler.server.server_close()
         print("[OK] Servidor parado com sucesso!")
-    except:
-        pass
-    sys.exit(0)
+    except Exception as e:
+        print(f"[ERRO] Erro ao parar servidor: {e}")
+    finally:
+        print("[FIM] Photo Mosaic finalizado.")
+        sys.exit(0)
 
 if __name__ == "__main__":
     PORT = 5000

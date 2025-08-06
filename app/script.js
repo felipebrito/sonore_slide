@@ -309,18 +309,18 @@ class PhotoMosaic {
         const currentImg = mosaicItem.querySelector('img');
         
         if (currentImg) {
-            // Anima a troca
-            currentImg.classList.add('fade-out');
+            // Transição mais suave
+            currentImg.style.transition = 'opacity 0.6s ease-in-out';
+            currentImg.style.opacity = '0.3';
             
             setTimeout(() => {
                 currentImg.src = newPhotoUrl;
-                currentImg.classList.remove('fade-out');
-                currentImg.classList.add('fade-in');
+                currentImg.style.opacity = '1';
                 
                 setTimeout(() => {
-                    currentImg.classList.remove('fade-in');
-                }, 400);
-            }, 400);
+                    currentImg.style.transition = '';
+                }, 600);
+            }, 300);
         } else {
             // Carrega diretamente se não há imagem
             this.loadImageInMosaicItem(mosaicItem, newPhotoUrl);
