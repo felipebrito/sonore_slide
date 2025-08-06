@@ -56,6 +56,14 @@ if not errorlevel 1 (
 echo [OK] Porta 5000 disponivel
 
 echo.
+echo [5/5] Limpando cache do navegador...
+echo [INFO] Para melhor performance, limpe o cache do navegador:
+echo [INFO] 1. Pressione Ctrl+Shift+Del
+echo [INFO] 2. Marque "Cache" e "Cookies"
+echo [INFO] 3. Clique em "Limpar dados"
+echo.
+
+echo.
 echo ========================================
 echo    INICIANDO PHOTO MOSAIC
 echo ========================================

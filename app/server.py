@@ -48,6 +48,16 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         if self.path == '/':
             self.send_response(302)
             self.send_header('Location', '/index.html')
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
+            self.end_headers()
+            return
+
+        # Handler para Service Worker (evita 404)
+        if self.path == '/sw.js':
+            self.send_response(404)
+            self.send_header('Content-type', 'text/plain')
             self.end_headers()
             return
 
@@ -100,7 +110,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 elif file_path.endswith('.js'):
                     self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
                 elif file_path.endswith('.html'):
-                    self.send_header('Cache-Control', 'no-cache')  # Sempre atual
+                    self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sempre atual
+                    self.send_header('Pragma', 'no-cache')
+                    self.send_header('Expires', '0')
                 
                 self.end_headers()
                 with open(file_path, 'rb') as f:
