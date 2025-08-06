@@ -1,9 +1,9 @@
 """
-Servidor otimizado para Photo Mosaic - Carregamento Rápido
+Servidor fixo para Photo Mosaic - Ctrl+C Funcionando
 - Ctrl+C funciona corretamente no Windows
-- Cache de fotos para carregamento mais rápido
-- Headers otimizados para performance
-- Sem logs desnecessários
+- Sempre encontra a pasta Fotos na raiz do projeto
+- Pode ser executado de qualquer diretório
+- Não depende de módulos externos
 """
 
 import http.server
@@ -14,8 +14,6 @@ import mimetypes
 import sys
 import signal
 import time
-import threading
-import msvcrt
 
 # Cache de fotos para carregamento mais rápido
 PHOTOS_CACHE = None
@@ -37,7 +35,7 @@ PROJECT_ROOT = find_project_root()
 FOTOS_DIR = os.path.join(PROJECT_ROOT, 'Fotos')
 APP_DIR = os.path.join(PROJECT_ROOT, 'app')
 
-class OptimizedPhotoServer(http.server.SimpleHTTPRequestHandler):
+class PhotoServer(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
         # Log apenas erros para melhor performance
         if '404' in format or '500' in format:
@@ -139,50 +137,27 @@ class OptimizedPhotoServer(http.server.SimpleHTTPRequestHandler):
         CACHE_TIMESTAMP = current_time
         return PHOTOS_CACHE
 
-class OptimizedHTTPServer(socketserver.TCPServer):
-    def __init__(self, server_address, RequestHandlerClass):
-        self.shutdown_flag = False
-        super().__init__(server_address, RequestHandlerClass)
-        self.allow_reuse_address = True
-        
-    def serve_forever(self):
-        print("[INFO] Servidor otimizado iniciado. Pressione Ctrl+C para parar...")
-        while not self.shutdown_flag:
-            try:
-                self.handle_request()
-            except KeyboardInterrupt:
-                print("\n[STOP] Ctrl+C detectado!")
-                break
-            except Exception as e:
-                print(f"[ERRO] Erro na requisição: {e}")
-                continue
-    
-    def shutdown(self):
-        print("[INFO] Parando servidor...")
-        self.shutdown_flag = True
-        self.server_close()
-
-def check_for_exit():
-    """Função para verificar se o usuário pressionou Ctrl+C"""
-    while True:
-        try:
-            if msvcrt.kbhit():
-                key = msvcrt.getch()
-                if key == b'\x03':  # Ctrl+C
-                    print("\n[STOP] Ctrl+C detectado!")
-                    return True
-        except:
-            pass
-        time.sleep(0.1)
+def signal_handler(signum, frame):
+    print("\n[STOP] Recebido sinal de parada (Ctrl+C)")
+    print("[INFO] Parando servidor...")
+    if hasattr(signal_handler, 'server'):
+        signal_handler.server.shutdown()
+    print("[OK] Servidor parado com sucesso!")
+    sys.exit(0)
 
 if __name__ == "__main__":
     PORT = 5000
     
+    # Configurar signal handler para Ctrl+C
+    signal.signal(signal.SIGINT, signal_handler)
+    
     try:
-        httpd = OptimizedHTTPServer(("", PORT), OptimizedPhotoServer)
+        httpd = socketserver.TCPServer(("", PORT), PhotoServer)
+        signal_handler.server = httpd
+        httpd.allow_reuse_address = True
         
         print("=" * 50)
-        print("   PHOTO MOSAIC SERVER - OTIMIZADO")
+        print("   PHOTO MOSAIC SERVER - FIXO")
         print("=" * 50)
         print(f"[OK] Servidor iniciado na porta {PORT}")
         print(f"[URL] Acesse: http://localhost:{PORT}")
@@ -198,10 +173,6 @@ if __name__ == "__main__":
         print("[STOP] Para parar o servidor, pressione Ctrl+C")
         print("=" * 50)
         print()
-        
-        # Iniciar thread para verificar Ctrl+C
-        exit_thread = threading.Thread(target=check_for_exit, daemon=True)
-        exit_thread.start()
         
         httpd.serve_forever()
         
