@@ -42,6 +42,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
             print(f"[{timestamp}] {message}")
 
     def do_GET(self):
+        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+        print(f"[{timestamp}] 🌐 Requisição recebida: {self.path}")
+        
         # Redirecionar raiz para a aplicação
         if self.path == '/':
             self.send_response(302)
@@ -61,6 +64,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
         # API para listar fotos (com cache)
         if self.path == '/api/photos':
+            timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+            print(f"[{timestamp}] 📡 Processando requisição /api/photos")
+            
             try:
                 photos = self.get_photos_from_directory_cached()
                 
@@ -78,11 +84,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 self.wfile.write(response_data.encode('utf-8'))
                 
                 # Log para debug
-                timestamp = time.strftime("%H:%M:%S.%f")[:-3]
-                print(f"[{timestamp}] 📡 API /api/photos: {len(photos)} fotos retornadas")
+                print(f"[{timestamp}] ✅ API /api/photos: {len(photos)} fotos retornadas ({len(response_data)} bytes)")
                 
             except Exception as e:
-                timestamp = time.strftime("%H:%M:%S.%f")[:-3]
                 print(f"[{timestamp}] ❌ Erro na API /api/photos: {e}")
                 self.send_response(500)
                 self.send_header('Content-type', 'application/json')
