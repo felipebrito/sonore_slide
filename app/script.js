@@ -357,31 +357,49 @@ class PhotoMosaic {
                 const addedPhotos = newPhotoNames.filter(name => !currentPhotoNames.includes(name));
                 
                 if (addedPhotos.length > 0) {
-                    console.log('Novas fotos detectadas:', addedPhotos);
+                    console.log('🆕 Novas fotos detectadas:', addedPhotos);
+                    console.log(`📊 Total de fotos: ${this.availablePhotos.length} → ${newPhotos.length}`);
                     this.addNewPhotosToMosaic(newPhotos);
+                } else {
+                    console.log('📁 Verificação de novas fotos: nenhuma nova foto encontrada');
                 }
+            } else {
+                console.error('❌ Erro na resposta da API:', response.status);
             }
         } catch (error) {
-            console.error('Erro ao verificar novas fotos:', error);
+            console.error('❌ Erro ao verificar novas fotos:', error);
         }
     }
     
     addNewPhotosToMosaic(newPhotos) {
+        console.log('🔄 Atualizando lista de fotos disponíveis...');
         this.availablePhotos = newPhotos;
         
-        // Adiciona algumas novas fotos ao mosaico
+        // Encontra fotos que não estão no mosaico atual
         const availableNewPhotos = newPhotos.filter(photo => 
             !this.photos.includes(photo)
         );
         
+        console.log(`📸 ${availableNewPhotos.length} novas fotos disponíveis para adicionar`);
+        
         if (availableNewPhotos.length > 0) {
-            const newPhoto = availableNewPhotos[0];
-            const randomIndex = Math.floor(Math.random() * 4);
+            // Adiciona múltiplas fotos novas de uma vez
+            const photosToAdd = Math.min(availableNewPhotos.length, 4);
             
-            this.replaceSinglePhoto(randomIndex, newPhoto);
-            this.photos[randomIndex] = newPhoto;
-            
-            this.updateStatus(`Nova foto adicionada: ${newPhoto.split('/').pop()}`);
+            // Força atualização imediata do mosaico
+            setTimeout(() => {
+                for (let i = 0; i < photosToAdd; i++) {
+                    const newPhoto = availableNewPhotos[i];
+                    const randomIndex = Math.floor(Math.random() * 4);
+                    
+                    console.log(`➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
+                    this.replaceSinglePhoto(randomIndex, newPhoto);
+                    this.photos[randomIndex] = newPhoto;
+                }
+                
+                this.updateStatus(`${photosToAdd} novas fotos adicionadas!`);
+                console.log(`✅ ${photosToAdd} novas fotos adicionadas ao mosaico`);
+            }, 100); // Pequeno delay para garantir que as mudanças sejam visíveis
         }
     }
     
