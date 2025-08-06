@@ -68,7 +68,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
             self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-            self.send_header('Cache-Control', 'public, max-age=300')  # Cache por 5 minutos
+            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sem cache
+            self.send_header('Pragma', 'no-cache')
+            self.send_header('Expires', '0')
             self.end_headers()
 
             photos = self.get_photos_from_directory_cached()
@@ -134,19 +136,24 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         global PHOTOS_CACHE, CACHE_TIMESTAMP
         current_time = time.time()
         
-        # Usar cache se ainda for válido (5 minutos)
-        if PHOTOS_CACHE and (current_time - CACHE_TIMESTAMP) < 300:
+        # Usar cache se ainda for válido (30 segundos apenas)
+        if PHOTOS_CACHE and (current_time - CACHE_TIMESTAMP) < 30:
             return PHOTOS_CACHE
         
         # Recarregar cache
         photos = []
         if os.path.exists(FOTOS_DIR):
             for filename in os.listdir(FOTOS_DIR):
-                if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
+                if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
                     photos.append(f'/Fotos/{filename}')
         
         PHOTOS_CACHE = sorted(photos)
         CACHE_TIMESTAMP = current_time
+        
+        # Log para debug
+        timestamp = time.strftime("%H:%M:%S")
+        print(f"[{timestamp}] 📸 Cache atualizado: {len(photos)} fotos encontradas")
+        
         return PHOTOS_CACHE
 
 def signal_handler(signum, frame):
