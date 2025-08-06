@@ -10,7 +10,8 @@ start.bat
 ```
 - Verifica automaticamente todos os requisitos
 - Instala Python se necessário
-- **Carregamento otimizado** - Abre mais rapidamente
+- **Limpa cache e processos** automaticamente
+- **Carregamento otimizado** - Abre em modo privado
 - Abre o navegador automaticamente
 - **Ctrl+C funciona corretamente para parar o servidor**
 
@@ -34,7 +35,7 @@ Slide/
 │   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── start.bat                       # ✅ Iniciador universal
+├── start.bat                       # ✅ Iniciador universal (tudo incluído)
 └── README.md                       # ✅ Este arquivo
 ```
 
@@ -66,7 +67,7 @@ Slide/
 ## 🛠️ Troubleshooting
 
 ### Windows - Se aparecer erro de comando não reconhecido:
-1. **Use:** `start.bat` (verifica tudo automaticamente)
+1. **Use:** `start.bat` (verifica tudo automaticamente, limpa cache e processos)
 
 ### Windows - Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -97,6 +98,7 @@ sudo yum install python3
 
 ## 🔄 Versões
 
+- **v6.5** - Estrutura ultra simplificada - Apenas um arquivo .bat com todas as funções
 - **v6.1** - Estrutura simplificada - Apenas um arquivo .bat
 - **v6.0** - Estrutura limpa e servidor otimizado
 - **v5.1** - Corrige wizard - Não para o servidor de teste
@@ -114,5 +116,5 @@ sudo yum install python3
 
 ---
 
-**Versão:** 6.1 - Estrutura simplificada - Apenas um arquivo .bat  
+**Versão:** 6.5 - Estrutura ultra simplificada - Apenas um arquivo .bat com todas as funções  
 **Status:** ✅ Funcional no Windows e Mac 
