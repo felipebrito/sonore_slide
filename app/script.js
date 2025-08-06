@@ -351,6 +351,7 @@ class PhotoMosaic {
         
         img.onload = () => {
             console.log(`✅ Imagem carregada com sucesso: ${fileName}`);
+            console.log(`📊 Imagem carregada em: ${mosaicItem.offsetWidth}x${mosaicItem.offsetHeight}`);
         };
         
         img.onerror = (event) => {
@@ -434,6 +435,9 @@ class PhotoMosaic {
             return;
         }
         
+        const fileName = newPhotoUrl.split('/').pop();
+        console.log(`🔄 Substituindo foto na posição ${mosaicIndex}: ${fileName}`);
+        
         const currentImg = mosaicItem.querySelector('img');
         
         if (currentImg) {
@@ -442,15 +446,18 @@ class PhotoMosaic {
             currentImg.style.opacity = '0.3';
             
             setTimeout(() => {
+                console.log(`🔄 Carregando nova imagem: ${fileName}`);
                 currentImg.src = newPhotoUrl;
                 currentImg.style.opacity = '1';
                 
                 setTimeout(() => {
                     currentImg.style.transition = '';
+                    console.log(`✅ Transição concluída: ${fileName}`);
                 }, 600);
             }, 300);
         } else {
             // Carrega diretamente se não há imagem
+            console.log(`🔄 Carregando imagem diretamente: ${fileName}`);
             this.loadImageInMosaicItem(mosaicItem, newPhotoUrl);
         }
     }
