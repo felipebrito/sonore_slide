@@ -382,20 +382,33 @@ class PhotoMosaic {
     }
     
     loadRandomImage(img, mosaicItem) {
+        // Contador de tentativas para evitar loop infinito
+        if (!this.retryCount) this.retryCount = 0;
+        
+        // Limita a 3 tentativas
+        if (this.retryCount >= 3) {
+            console.warn(`⚠️ Máximo de tentativas atingido (${this.retryCount}), mostrando imagem de erro`);
+            this.retryCount = 0;
+            this.showErrorImage(img, 'Erro de carregamento', '');
+            return;
+        }
+        
+        this.retryCount++;
+        
         // Tenta carregar uma imagem aleatória da lista disponível
         if (this.availablePhotos.length > 0) {
             const randomPhoto = this.availablePhotos[Math.floor(Math.random() * this.availablePhotos.length)];
             const randomFileName = randomPhoto.split('/').pop();
             
-            console.log(`🔄 Tentando carregar imagem aleatória: ${randomFileName}`);
+            console.log(`🔄 Tentativa ${this.retryCount}/3: carregando imagem aleatória: ${randomFileName}`);
             
             // Remove eventos de erro anteriores
             img.onerror = null;
             
             // Adiciona novo evento de erro
             img.onerror = () => {
-                console.warn(`⚠️ Falha ao carregar imagem aleatória: ${randomFileName}`);
-                this.showErrorImage(img, 'Imagem não disponível', randomPhoto);
+                console.warn(`⚠️ Falha na tentativa ${this.retryCount}/3: ${randomFileName}`);
+                this.loadRandomImage(img, mosaicItem);
             };
             
             // Carrega a nova imagem
@@ -403,6 +416,8 @@ class PhotoMosaic {
             const finalUrl = randomPhoto.includes('?') ? `${randomPhoto}&t=${timestamp}` : `${randomPhoto}?t=${timestamp}`;
             img.src = finalUrl;
         } else {
+            console.warn(`⚠️ Nenhuma imagem disponível na lista`);
+            this.retryCount = 0;
             this.showErrorImage(img, 'Nenhuma imagem disponível', '');
         }
     }
@@ -412,16 +427,20 @@ class PhotoMosaic {
         img.src = `data:image/svg+xml;base64,${btoa(`
             <svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
                 <rect width="100%" height="100%" fill="#2c3e50"/>
-                <text x="50%" y="40%" font-family="Arial" font-size="16" fill="#ecf0f1" text-anchor="middle">Carregando...</text>
+                <text x="50%" y="40%" font-family="Arial" font-size="16" fill="#ecf0f1" text-anchor="middle">Erro de Carregamento</text>
                 <text x="50%" y="55%" font-family="Arial" font-size="12" fill="#bdc3c7" text-anchor="middle">${fileName}</text>
-                <text x="50%" y="70%" font-family="Arial" font-size="10" fill="#95a5a6" text-anchor="middle">Aguarde...</text>
+                <text x="50%" y="70%" font-family="Arial" font-size="10" fill="#95a5a6" text-anchor="middle">Clique para tentar novamente</text>
             </svg>
         `)}`;
+        
+        // Remove contador de tentativas
+        this.retryCount = 0;
         
         // Adiciona evento de clique para tentar recarregar
         img.onclick = () => {
             console.log(`🔄 Tentando recarregar: ${fileName}`);
             if (retryUrl) {
+                this.retryCount = 0; // Reset contador
                 img.src = retryUrl;
             }
         };
