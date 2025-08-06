@@ -399,19 +399,21 @@ class PhotoMosaic {
         console.log(`[${timestamp}] 📸 ${availableNewPhotos.length} novas fotos disponíveis para adicionar`);
         
         if (availableNewPhotos.length > 0) {
-            // Garante que novas fotos sejam sempre exibidas
+            // Adiciona apenas as novas fotos, respeitando ordem de adição
             const photosToAdd = Math.min(availableNewPhotos.length, 4);
             
             // Força atualização imediata do mosaico
             setTimeout(() => {
                 const displayStartTime = performance.now();
                 
-                // Substitui todas as posições do mosaico com novas fotos
-                for (let i = 0; i < 4; i++) {
-                    const newPhoto = availableNewPhotos[i % availableNewPhotos.length];
-                    console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${i}`);
-                    this.replaceSinglePhoto(i, newPhoto);
-                    this.photos[i] = newPhoto;
+                // Substitui apenas as posições necessárias com novas fotos
+                for (let i = 0; i < photosToAdd; i++) {
+                    const newPhoto = availableNewPhotos[i];
+                    const randomIndex = Math.floor(Math.random() * 4);
+                    
+                    console.log(`[${timestamp}] ➕ Adicionando nova foto: ${newPhoto.split('/').pop()} na posição ${randomIndex}`);
+                    this.replaceSinglePhoto(randomIndex, newPhoto);
+                    this.photos[randomIndex] = newPhoto;
                 }
                 
                 const displayEndTime = performance.now();
