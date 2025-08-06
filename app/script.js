@@ -40,18 +40,18 @@ class PhotoMosaic {
             item.className = 'mosaic-item';
             item.setAttribute('data-index', i);
             
-            // Adiciona evento de clique para visualização em tela cheia
-            item.addEventListener('click', () => {
-                const img = item.querySelector('img');
-                if (img) {
-                    this.showFullscreen(img.src);
-                }
-            });
+            // Clique desabilitado - apenas visualização
+            // item.addEventListener('click', () => {
+            //     const img = item.querySelector('img');
+            //     if (img) {
+            //         this.showFullscreen(img.src);
+            //     }
+            // });
             
             this.mosaic.appendChild(item);
         }
         
-        console.log('✅ Mosaico criado com 4 itens verticais');
+        console.log('✅ Mosaico criado com 4 itens verticais (clique desabilitado)');
     }
     
     bindEvents() {
@@ -395,32 +395,7 @@ class PhotoMosaic {
         }
     }
     
-    showFullscreen(photoUrl) {
-        const modal = document.getElementById('fullscreenModal');
-        const img = document.getElementById('fullscreenImage');
-        
-        if (modal && img) {
-            img.src = photoUrl;
-            modal.style.display = 'block';
-            
-            // Fecha com ESC
-            const handleKeyPress = (e) => {
-                if (e.key === 'Escape') {
-                    this.closeFullscreen();
-                    document.removeEventListener('keydown', handleKeyPress);
-                }
-            };
-            
-            document.addEventListener('keydown', handleKeyPress);
-        }
-    }
-    
-    closeFullscreen() {
-        const modal = document.getElementById('fullscreenModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    }
+    // showFullscreen e closeFullscreen removidos - clique desabilitado
     
     updateConfig(newConfig) {
         this.config = { ...this.config, ...newConfig };
@@ -530,12 +505,7 @@ function addRandomPhoto() {
     }
 }
 
-function closeFullscreen() {
-    const modal = document.getElementById('fullscreenModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
+// closeFullscreen removido - clique desabilitado
 
 // Inicializa a aplicação quando a página carregar
 document.addEventListener('DOMContentLoaded', () => {
