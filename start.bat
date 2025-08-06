@@ -60,7 +60,7 @@ echo [OK] Porta 5000 disponivel
 echo.
 echo [6/6] Iniciando servidor...
 echo [INFO] Aguardando servidor inicializar...
-start /min python app\server.py
+start python app\server.py
 timeout /t 5 /nobreak >nul
 
 echo.
