@@ -98,8 +98,14 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
             # Servir fotos da pasta Fotos/
             elif self.path.startswith('/Fotos/'):
-                from urllib.parse import unquote
-                photo_path = unquote(self.path[7:])  # Remove '/Fotos/' prefix e decodifica URL
+                from urllib.parse import unquote, urlparse
+                # Remove '/Fotos/' prefix e decodifica URL
+                photo_path = unquote(self.path[7:])
+                
+                # Remove parâmetros de query (timestamp) do nome do arquivo
+                if '?' in photo_path:
+                    photo_path = photo_path.split('?')[0]
+                
                 full_path = os.path.join(FOTOS_DIR, photo_path)
 
                 if os.path.exists(full_path) and os.path.isfile(full_path):
@@ -152,13 +158,16 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                     print(f"[{timestamp}] ❌ Arquivo não encontrado: {full_path}")
                     print(f"[{timestamp}] 📁 Pasta Fotos: {FOTOS_DIR}")
                     print(f"[{timestamp}] 🔍 Arquivo solicitado: {photo_path}")
+                    print(f"[{timestamp}] 🔗 URL original: {self.path}")
                     
                     # Lista arquivos na pasta para debug
                     if os.path.exists(FOTOS_DIR):
                         try:
                             files = os.listdir(FOTOS_DIR)
                             avif_files = [f for f in files if f.lower().endswith('.avif')]
+                            webp_files = [f for f in files if f.lower().endswith('.webp')]
                             print(f"[{timestamp}] 📋 Arquivos .avif na pasta: {avif_files}")
+                            print(f"[{timestamp}] 📋 Arquivos .webp na pasta: {webp_files}")
                         except Exception as e:
                             print(f"[{timestamp}] ❌ Erro ao listar pasta: {e}")
                     
