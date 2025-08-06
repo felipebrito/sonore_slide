@@ -35,7 +35,7 @@ echo [INFO] 1. Aguarde alguns segundos
 echo [INFO] 2. Recarregue a pagina (F5)
 echo [INFO] 3. Tente acessar manualmente: http://localhost:5000
 echo.
-python app\server_windows_fixed.py
+python app\server_windows_final.py
 
 echo.
 echo OK: Servidor parado com sucesso!
