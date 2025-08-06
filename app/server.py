@@ -61,18 +61,34 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
         # API para listar fotos (com cache)
         if self.path == '/api/photos':
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.send_header('Access-Control-Allow-Origin', '*')
-            self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
-            self.send_header('Access-Control-Allow-Headers', 'Content-Type')
-            self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sem cache
-            self.send_header('Pragma', 'no-cache')
-            self.send_header('Expires', '0')
-            self.end_headers()
+            try:
+                photos = self.get_photos_from_directory_cached()
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+                self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+                self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')  # Sem cache
+                self.send_header('Pragma', 'no-cache')
+                self.send_header('Expires', '0')
+                self.end_headers()
 
-            photos = self.get_photos_from_directory_cached()
-            self.wfile.write(json.dumps(photos).encode('utf-8'))
+                response_data = json.dumps(photos)
+                self.wfile.write(response_data.encode('utf-8'))
+                
+                # Log para debug
+                timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+                print(f"[{timestamp}] 📡 API /api/photos: {len(photos)} fotos retornadas")
+                
+            except Exception as e:
+                timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+                print(f"[{timestamp}] ❌ Erro na API /api/photos: {e}")
+                self.send_response(500)
+                self.send_header('Content-type', 'application/json')
+                self.end_headers()
+                error_response = json.dumps({"error": str(e)})
+                self.wfile.write(error_response.encode('utf-8'))
             return
 
         # Servir fotos da pasta Fotos/
@@ -136,17 +152,29 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         start_time = time.time()
         photos = []
         
+        timestamp = time.strftime("%H:%M:%S.%f")[:-3]
+        print(f"[{timestamp}] 🔍 Iniciando leitura da pasta: {FOTOS_DIR}")
+        
         if os.path.exists(FOTOS_DIR):
-            for filename in os.listdir(FOTOS_DIR):
-                if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
-                    photos.append(f'/Fotos/{filename}')
+            try:
+                files = os.listdir(FOTOS_DIR)
+                print(f"[{timestamp}] 📁 Encontrados {len(files)} arquivos na pasta")
+                
+                for filename in files:
+                    if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
+                        photos.append(f'/Fotos/{filename}')
+                        print(f"[{timestamp}] ✅ Foto detectada: {filename}")
+                
+            except Exception as e:
+                print(f"[{timestamp}] ❌ Erro ao ler pasta: {e}")
+        else:
+            print(f"[{timestamp}] ❌ Pasta não encontrada: {FOTOS_DIR}")
         
         end_time = time.time()
         detection_time = (end_time - start_time) * 1000  # Convert to milliseconds
         
         # Log detalhado com timestamp
-        timestamp = time.strftime("%H:%M:%S.%f")[:-3]  # Include milliseconds
-        print(f"[{timestamp}] 📸 Detecção instantânea: {len(photos)} fotos em {detection_time:.1f}ms")
+        print(f"[{timestamp}] 📸 Detecção concluída: {len(photos)} fotos em {detection_time:.1f}ms")
         
         return sorted(photos)
 
