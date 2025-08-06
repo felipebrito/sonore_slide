@@ -15,9 +15,7 @@ import sys
 import signal
 import time
 
-# Cache de fotos para carregamento mais rápido
-PHOTOS_CACHE = None
-CACHE_TIMESTAMP = 0
+# Detecção instantânea de fotos (sem cache)
 
 # Função para encontrar a raiz do projeto
 def find_project_root():
@@ -133,28 +131,18 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         self.end_headers()
 
     def get_photos_from_directory_cached(self):
-        global PHOTOS_CACHE, CACHE_TIMESTAMP
-        current_time = time.time()
-        
-        # Usar cache se ainda for válido (30 segundos apenas)
-        if PHOTOS_CACHE and (current_time - CACHE_TIMESTAMP) < 30:
-            return PHOTOS_CACHE
-        
-        # Recarregar cache
+        # Sem cache - sempre lê a pasta diretamente
         photos = []
         if os.path.exists(FOTOS_DIR):
             for filename in os.listdir(FOTOS_DIR):
                 if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.avif')):
                     photos.append(f'/Fotos/{filename}')
         
-        PHOTOS_CACHE = sorted(photos)
-        CACHE_TIMESTAMP = current_time
-        
         # Log para debug
         timestamp = time.strftime("%H:%M:%S")
-        print(f"[{timestamp}] 📸 Cache atualizado: {len(photos)} fotos encontradas")
+        print(f"[{timestamp}] 📸 Detecção instantânea: {len(photos)} fotos encontradas")
         
-        return PHOTOS_CACHE
+        return sorted(photos)
 
 def signal_handler(signum, frame):
     print("\n[STOP] Recebido sinal de parada (Ctrl+C)")
