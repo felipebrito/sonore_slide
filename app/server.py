@@ -152,9 +152,12 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 def signal_handler(signum, frame):
     print("\n[STOP] Recebido sinal de parada (Ctrl+C)")
     print("[INFO] Parando servidor...")
-    if hasattr(signal_handler, 'server'):
-        signal_handler.server.shutdown()
-    print("[OK] Servidor parado com sucesso!")
+    try:
+        if hasattr(signal_handler, 'server'):
+            signal_handler.server.shutdown()
+        print("[OK] Servidor parado com sucesso!")
+    except:
+        pass
     sys.exit(0)
 
 if __name__ == "__main__":
