@@ -4,21 +4,27 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 ## 🚀 Como Usar
 
-### Windows
+### Windows (Recomendado)
+
+#### Wizard de Inicialização (Recomendado)
+```
+wizard.bat
+```
+- Verifica automaticamente todos os requisitos
+- Instala Python se necessário
+- Testa o servidor antes de abrir
+- Abre o navegador automaticamente
+
+#### Iniciador Rápido
 ```
 start.bat
 ```
-- O script verifica se o Python está instalado
-- Se não estiver, abre o site de download automaticamente
-- Depois de instalar, execute novamente o `start.bat`
-- **Ctrl+C agora funciona corretamente para parar o servidor**
+- Inicia diretamente o servidor
+- Abre o navegador automaticamente
+- **Ctrl+C funciona corretamente para parar o servidor**
 
 ### Mac/Linux
-```
-./start.sh
-```
-ou
-```
+```bash
 python3 app/server.py
 ```
 
@@ -32,14 +38,13 @@ python3 app/server.py
 ```
 Slide/
 ├── app/
-│   ├── server.py                   # ✅ Servidor universal (Mac/Linux)
-│   ├── server_windows_fixed.py     # ✅ Servidor Windows otimizado
+│   ├── server.py                   # ✅ Servidor universal (Windows/Mac)
 │   ├── index.html                  # ✅ Interface principal
 │   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── start.bat                       # ✅ Iniciador Windows
-├── start.sh                        # ✅ Iniciador Mac/Linux
+├── wizard.bat                      # ✅ Wizard de inicialização
+├── start.bat                       # ✅ Iniciador rápido
 └── README.md                       # ✅ Este arquivo
 ```
 
@@ -64,7 +69,7 @@ Slide/
 ## 🛠️ Troubleshooting
 
 ### Windows - Se aparecer erro de comando não reconhecido:
-1. **Use:** `start.bat` (versão universal)
+1. **Use:** `wizard.bat` (verifica tudo automaticamente)
 
 ### Windows - Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -95,6 +100,9 @@ sudo yum install python3
 
 ## 🔄 Versões
 
+- **v5.0** - Estrutura limpa e wizard completo
+- **v4.4** - Versão final do servidor Windows
+- **v4.3** - Scripts de debug para Windows
 - **v4.2** - Ctrl+C funcionando no Windows
 - **v4.1** - Scripts de debug para Windows
 - **v4.0** - Estrutura limpa e universal
@@ -106,5 +114,5 @@ sudo yum install python3
 
 ---
 
-**Versão:** 4.2 - Ctrl+C funcionando no Windows  
+**Versão:** 5.0 - Estrutura limpa e wizard completo  
 **Status:** ✅ Funcional no Windows e Mac 

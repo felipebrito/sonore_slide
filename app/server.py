@@ -1,5 +1,6 @@
 """
-Servidor universal para Photo Mosaic - Compatível com Windows e Mac
+Servidor universal para Photo Mosaic - Versão Windows Final
+- Ctrl+C funciona corretamente no Windows
 - Sempre encontra a pasta Fotos na raiz do projeto
 - Pode ser executado de qualquer diretório
 - Não depende de módulos externos
@@ -13,6 +14,8 @@ import mimetypes
 import sys
 import signal
 import time
+import threading
+import msvcrt
 
 # Função para encontrar a raiz do projeto (onde está a pasta Fotos)
 def find_project_root():
@@ -107,32 +110,50 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                     photos.append(f'/Fotos/{filename}')
         return sorted(photos)
 
-class StoppableHTTPServer(socketserver.TCPServer):
+class WindowsHTTPServer(socketserver.TCPServer):
     def __init__(self, server_address, RequestHandlerClass):
         self.shutdown_flag = False
         super().__init__(server_address, RequestHandlerClass)
+        self.allow_reuse_address = True
+        
     def serve_forever(self):
+        print("[INFO] Servidor iniciado. Pressione Ctrl+C para parar...")
         while not self.shutdown_flag:
-            self.handle_request()
+            try:
+                self.handle_request()
+            except KeyboardInterrupt:
+                print("\n[STOP] Ctrl+C detectado!")
+                break
+            except Exception as e:
+                print(f"[ERRO] Erro na requisição: {e}")
+                continue
+    
     def shutdown(self):
+        print("[INFO] Parando servidor...")
         self.shutdown_flag = True
+        self.server_close()
 
-def signal_handler(signum, frame):
-    print("\n[STOP] Recebido sinal de parada (Ctrl+C)")
-    print("[INFO] Parando servidor...")
-    if hasattr(signal_handler, 'server'):
-        signal_handler.server.shutdown()
-    print("[OK] Servidor parado com sucesso!")
-    sys.exit(0)
+def check_for_exit():
+    """Função para verificar se o usuário pressionou Ctrl+C"""
+    while True:
+        try:
+            if msvcrt.kbhit():
+                key = msvcrt.getch()
+                if key == b'\x03':  # Ctrl+C
+                    print("\n[STOP] Ctrl+C detectado!")
+                    return True
+        except:
+            pass
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     PORT = 5000
-    signal.signal(signal.SIGINT, signal_handler)
+    
     try:
-        httpd = StoppableHTTPServer(("", PORT), PhotoServer)
-        signal_handler.server = httpd
+        httpd = WindowsHTTPServer(("", PORT), PhotoServer)
+        
         print("=" * 50)
-        print("   PHOTO MOSAIC SERVER - UNIVERSAL")
+        print("   PHOTO MOSAIC SERVER - WINDOWS FINAL")
         print("=" * 50)
         print(f"[OK] Servidor iniciado na porta {PORT}")
         print(f"[URL] Acesse: http://localhost:{PORT}")
@@ -148,7 +169,13 @@ if __name__ == "__main__":
         print("[STOP] Para parar o servidor, pressione Ctrl+C")
         print("=" * 50)
         print()
+        
+        # Iniciar thread para verificar Ctrl+C
+        exit_thread = threading.Thread(target=check_for_exit, daemon=True)
+        exit_thread.start()
+        
         httpd.serve_forever()
+        
     except KeyboardInterrupt:
         print("\n[STOP] Photo Mosaic encerrado pelo usuario.")
     except OSError as e:
