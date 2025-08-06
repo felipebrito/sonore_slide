@@ -4,24 +4,21 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 ## 🚀 Como Usar
 
-### Windows (Recomendado)
-
-#### Iniciador Universal
+### Windows
 ```
 start.bat
 ```
-- O script verifica se o Python está instalado.
-- Se não estiver, abre o site de download e mostra instruções.
-- Depois de instalar, execute novamente o `start.bat`.
-
-#### Opção Manual
-```
-python app\server_crossplatform.py
-```
+- O script verifica se o Python está instalado
+- Se não estiver, abre o site de download automaticamente
+- Depois de instalar, execute novamente o `start.bat`
 
 ### Mac/Linux
 ```
-python3 app/server_crossplatform.py
+./start.sh
+```
+ou
+```
+python3 app/server.py
 ```
 
 ### Passos:
@@ -34,13 +31,13 @@ python3 app/server_crossplatform.py
 ```
 Slide/
 ├── app/
-│   ├── server_crossplatform.py     # ✅ Servidor universal (Windows/Mac)
-│   ├── index_corrigido.html        # ✅ Interface principal
-│   ├── script_corrigido.js         # ✅ JavaScript
+│   ├── server.py                   # ✅ Servidor universal (Windows/Mac)
+│   ├── index.html                  # ✅ Interface principal
+│   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── start.bat                       # ✅ Iniciador universal
-├── limpar_cache.bat                # ✅ Limpeza de cache
+├── start.bat                       # ✅ Iniciador Windows
+├── start.sh                        # ✅ Iniciador Mac/Linux
 └── README.md                       # ✅ Este arquivo
 ```
 
@@ -64,31 +61,39 @@ Slide/
 
 ## 🛠️ Troubleshooting
 
-### Se aparecer erro de comando não reconhecido:
+### Windows - Se aparecer erro de comando não reconhecido:
 1. **Use:** `start.bat` (versão universal)
 
-### Se o servidor não parar com Ctrl+C:
+### Windows - Se o servidor não parar com Ctrl+C:
 ```cmd
 taskkill /f /im python.exe
 ```
 
-### Se a porta 5000 estiver em uso:
+### Windows - Se a porta 5000 estiver em uso:
 ```cmd
-limpar_cache.bat
+netstat -ano | findstr :5000
+taskkill /PID [PID_NUMBER] /F
+```
+
+### Mac/Linux - Se Python não for encontrado:
+```bash
+# macOS
+brew install python3
+
+# Ubuntu/Debian
+sudo apt-get install python3
+
+# CentOS/RHEL
+sudo yum install python3
 ```
 
 ### Se o navegador não carregar:
 1. Limpe o cache do navegador (Ctrl+Shift+Del)
-2. Execute `limpar_cache.bat`
-3. Execute `start.bat`
-
-### Se Python não for encontrado:
-1. O próprio `start.bat` abrirá o site de download
-2. Instale Python e marque "Add Python to PATH"
-3. Reinicie o prompt de comando
+2. Acesse manualmente: `http://localhost:5000`
 
 ## 🔄 Versões
 
+- **v4.0** - Estrutura limpa e universal
 - **v3.1** - Iniciador universal com verificação de Python
 - **v3.0** - Servidor universal multiplataforma
 - **v2.2** - Múltiplas opções de iniciador para compatibilidade
@@ -97,5 +102,5 @@ limpar_cache.bat
 
 ---
 
-**Versão:** 3.1 - Universal com verificação de Python  
+**Versão:** 4.0 - Estrutura limpa e universal  
 **Status:** ✅ Funcional no Windows e Mac 
