@@ -27,7 +27,14 @@ echo 2. Iniciando servidor universal...
 echo URL: http://localhost:5000
 echo Para parar: Ctrl+C
 echo.
+echo [INFO] Aguardando 3 segundos antes de abrir o navegador...
+timeout /t 3 /nobreak >nul
 start http://localhost:5000
+echo [INFO] Navegador aberto. Se a pagina nao carregar:
+echo [INFO] 1. Aguarde alguns segundos
+echo [INFO] 2. Recarregue a pagina (F5)
+echo [INFO] 3. Tente acessar manualmente: http://localhost:5000
+echo.
 python app\server.py
 
 echo.
