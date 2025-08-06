@@ -103,13 +103,36 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
             if os.path.exists(full_path) and os.path.isfile(full_path):
                 self.send_response(200)
-                content_type, _ = mimetypes.guess_type(full_path)
+                
+                # Detecção específica de MIME types para AVIF e outros formatos
+                content_type = None
+                if full_path.lower().endswith('.avif'):
+                    content_type = 'image/avif'
+                elif full_path.lower().endswith('.webp'):
+                    content_type = 'image/webp'
+                elif full_path.lower().endswith('.png'):
+                    content_type = 'image/png'
+                elif full_path.lower().endswith(('.jpg', '.jpeg')):
+                    content_type = 'image/jpeg'
+                elif full_path.lower().endswith('.gif'):
+                    content_type = 'image/gif'
+                else:
+                    content_type, _ = mimetypes.guess_type(full_path)
+                
                 if content_type:
                     self.send_header('Content-type', content_type)
+                
+                # Headers específicos para AVIF
+                if full_path.lower().endswith('.avif'):
+                    self.send_header('Accept', 'image/avif,image/webp,image/jpeg,image/png')
+                    self.send_header('Vary', 'Accept')
+                
                 # Headers para cache de imagens
                 self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
                 self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
+                self.send_header('Access-Control-Allow-Origin', '*')
                 self.end_headers()
+                
                 with open(full_path, 'rb') as f:
                     self.wfile.write(f.read())
             else:
