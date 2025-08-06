@@ -27,8 +27,8 @@ echo 2. Iniciando servidor Windows otimizado...
 echo URL: http://localhost:5000
 echo Para parar: Ctrl+C (agora funciona!)
 echo.
-echo [INFO] Aguardando 3 segundos antes de abrir o navegador...
-timeout /t 3 /nobreak >nul
+echo [INFO] Aguardando 2 segundos antes de abrir o navegador...
+timeout /t 2 /nobreak >nul
 start http://localhost:5000
 echo [INFO] Navegador aberto. Se a pagina nao carregar:
 echo [INFO] 1. Aguarde alguns segundos

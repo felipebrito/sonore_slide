@@ -63,8 +63,8 @@ echo.
 echo [INFO] URL: http://localhost:5000
 echo [INFO] Para parar: Ctrl+C
 echo.
-echo [INFO] Aguardando 3 segundos...
-timeout /t 3 /nobreak >nul
+echo [INFO] Aguardando 2 segundos...
+timeout /t 2 /nobreak >nul
 
 :: Abrir navegador e iniciar servidor
 start http://localhost:5000

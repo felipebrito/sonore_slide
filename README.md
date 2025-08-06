@@ -8,18 +8,18 @@ Uma aplicação web simples para exibir fotos em formato de slides automático.
 
 #### Wizard de Inicialização (Recomendado)
 ```
-wizard.bat
+wizard_simples.bat
 ```
 - Verifica automaticamente todos os requisitos
 - Instala Python se necessário
-- Testa o servidor antes de abrir
+- **Carregamento otimizado** - Abre mais rapidamente
 - Abre o navegador automaticamente
 
 #### Iniciador Rápido
 ```
 start.bat
 ```
-- Inicia diretamente o servidor
+- Inicia diretamente o servidor otimizado
 - Abre o navegador automaticamente
 - **Ctrl+C funciona corretamente para parar o servidor**
 
@@ -38,12 +38,12 @@ python3 app/server.py
 ```
 Slide/
 ├── app/
-│   ├── server.py                   # ✅ Servidor universal (Windows/Mac)
+│   ├── server.py                   # ✅ Servidor otimizado (Windows/Mac)
 │   ├── index.html                  # ✅ Interface principal
 │   ├── script.js                   # ✅ JavaScript
 │   └── styles.css                  # ✅ Estilos CSS
 ├── Fotos/                          # ✅ Suas fotos aqui
-├── wizard.bat                      # ✅ Wizard de inicialização
+├── wizard_simples.bat              # ✅ Wizard otimizado
 ├── start.bat                       # ✅ Iniciador rápido
 └── README.md                       # ✅ Este arquivo
 ```
@@ -66,10 +66,17 @@ Slide/
 - Python 3.6+
 - Windows 10/11 ou Mac/Linux
 
+## ⚡ Otimizações
+
+- **Cache de fotos** - Carregamento mais rápido
+- **Headers otimizados** - Melhor performance
+- **Logs reduzidos** - Apenas erros são exibidos
+- **Cache de navegador** - Arquivos estáticos em cache
+
 ## 🛠️ Troubleshooting
 
 ### Windows - Se aparecer erro de comando não reconhecido:
-1. **Use:** `wizard.bat` (verifica tudo automaticamente)
+1. **Use:** `wizard_simples.bat` (verifica tudo automaticamente)
 
 ### Windows - Se o servidor não parar com Ctrl+C:
 ```cmd
@@ -100,6 +107,8 @@ sudo yum install python3
 
 ## 🔄 Versões
 
+- **v6.0** - Estrutura limpa e servidor otimizado
+- **v5.1** - Corrige wizard - Não para o servidor de teste
 - **v5.0** - Estrutura limpa e wizard completo
 - **v4.4** - Versão final do servidor Windows
 - **v4.3** - Scripts de debug para Windows
@@ -114,5 +123,5 @@ sudo yum install python3
 
 ---
 
-**Versão:** 5.0 - Estrutura limpa e wizard completo  
+**Versão:** 6.0 - Estrutura limpa e servidor otimizado  
 **Status:** ✅ Funcional no Windows e Mac 

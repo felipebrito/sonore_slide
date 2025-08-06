@@ -1,9 +1,9 @@
 """
-Servidor universal para Photo Mosaic - Versão Windows Final
+Servidor otimizado para Photo Mosaic - Carregamento Rápido
 - Ctrl+C funciona corretamente no Windows
-- Sempre encontra a pasta Fotos na raiz do projeto
-- Pode ser executado de qualquer diretório
-- Não depende de módulos externos
+- Cache de fotos para carregamento mais rápido
+- Headers otimizados para performance
+- Sem logs desnecessários
 """
 
 import http.server
@@ -17,7 +17,11 @@ import time
 import threading
 import msvcrt
 
-# Função para encontrar a raiz do projeto (onde está a pasta Fotos)
+# Cache de fotos para carregamento mais rápido
+PHOTOS_CACHE = None
+CACHE_TIMESTAMP = 0
+
+# Função para encontrar a raiz do projeto
 def find_project_root():
     current = os.path.abspath(os.getcwd())
     while True:
@@ -27,18 +31,19 @@ def find_project_root():
         if parent == current:
             break
         current = parent
-    # Fallback: assume cwd
     return os.path.abspath(os.getcwd())
 
 PROJECT_ROOT = find_project_root()
 FOTOS_DIR = os.path.join(PROJECT_ROOT, 'Fotos')
 APP_DIR = os.path.join(PROJECT_ROOT, 'app')
 
-class PhotoServer(http.server.SimpleHTTPRequestHandler):
+class OptimizedPhotoServer(http.server.SimpleHTTPRequestHandler):
     def log_message(self, format, *args):
-        timestamp = time.strftime("%H:%M:%S")
-        message = format % args
-        print(f"[{timestamp}] {message}")
+        # Log apenas erros para melhor performance
+        if '404' in format or '500' in format:
+            timestamp = time.strftime("%H:%M:%S")
+            message = format % args
+            print(f"[{timestamp}] {message}")
 
     def do_GET(self):
         # Redirecionar raiz para a aplicação
@@ -48,16 +53,17 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
             self.end_headers()
             return
 
-        # API para listar fotos
+        # API para listar fotos (com cache)
         if self.path == '/api/photos':
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.send_header('Access-Control-Allow-Origin', '*')
             self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
             self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+            self.send_header('Cache-Control', 'public, max-age=300')  # Cache por 5 minutos
             self.end_headers()
 
-            photos = self.get_photos_from_directory()
+            photos = self.get_photos_from_directory_cached()
             self.wfile.write(json.dumps(photos).encode('utf-8'))
             return
 
@@ -71,6 +77,9 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 content_type, _ = mimetypes.guess_type(full_path)
                 if content_type:
                     self.send_header('Content-type', content_type)
+                # Headers para cache de imagens
+                self.send_header('Cache-Control', 'public, max-age=86400')  # Cache por 24h
+                self.send_header('Expires', 'Thu, 31 Dec 2025 23:59:59 GMT')
                 self.end_headers()
                 with open(full_path, 'rb') as f:
                     self.wfile.write(f.read())
@@ -86,6 +95,15 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
                 content_type, _ = mimetypes.guess_type(file_path)
                 if content_type:
                     self.send_header('Content-type', content_type)
+                
+                # Cache diferente para arquivos estáticos
+                if file_path.endswith('.css'):
+                    self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
+                elif file_path.endswith('.js'):
+                    self.send_header('Cache-Control', 'public, max-age=3600')  # 1h
+                elif file_path.endswith('.html'):
+                    self.send_header('Cache-Control', 'no-cache')  # Sempre atual
+                
                 self.end_headers()
                 with open(file_path, 'rb') as f:
                     self.wfile.write(f.read())
@@ -102,22 +120,33 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
 
-    def get_photos_from_directory(self):
+    def get_photos_from_directory_cached(self):
+        global PHOTOS_CACHE, CACHE_TIMESTAMP
+        current_time = time.time()
+        
+        # Usar cache se ainda for válido (5 minutos)
+        if PHOTOS_CACHE and (current_time - CACHE_TIMESTAMP) < 300:
+            return PHOTOS_CACHE
+        
+        # Recarregar cache
         photos = []
         if os.path.exists(FOTOS_DIR):
             for filename in os.listdir(FOTOS_DIR):
                 if filename.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp')):
                     photos.append(f'/Fotos/{filename}')
-        return sorted(photos)
+        
+        PHOTOS_CACHE = sorted(photos)
+        CACHE_TIMESTAMP = current_time
+        return PHOTOS_CACHE
 
-class WindowsHTTPServer(socketserver.TCPServer):
+class OptimizedHTTPServer(socketserver.TCPServer):
     def __init__(self, server_address, RequestHandlerClass):
         self.shutdown_flag = False
         super().__init__(server_address, RequestHandlerClass)
         self.allow_reuse_address = True
         
     def serve_forever(self):
-        print("[INFO] Servidor iniciado. Pressione Ctrl+C para parar...")
+        print("[INFO] Servidor otimizado iniciado. Pressione Ctrl+C para parar...")
         while not self.shutdown_flag:
             try:
                 self.handle_request()
@@ -150,10 +179,10 @@ if __name__ == "__main__":
     PORT = 5000
     
     try:
-        httpd = WindowsHTTPServer(("", PORT), PhotoServer)
+        httpd = OptimizedHTTPServer(("", PORT), OptimizedPhotoServer)
         
         print("=" * 50)
-        print("   PHOTO MOSAIC SERVER - WINDOWS FINAL")
+        print("   PHOTO MOSAIC SERVER - OTIMIZADO")
         print("=" * 50)
         print(f"[OK] Servidor iniciado na porta {PORT}")
         print(f"[URL] Acesse: http://localhost:{PORT}")
