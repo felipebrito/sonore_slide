@@ -77,7 +77,8 @@ class PhotoServer(http.server.SimpleHTTPRequestHandler):
 
         # Servir fotos da pasta Fotos/
         elif self.path.startswith('/Fotos/'):
-            photo_path = self.path[7:]  # Remove '/Fotos/' prefix
+            from urllib.parse import unquote
+            photo_path = unquote(self.path[7:])  # Remove '/Fotos/' prefix e decodifica URL
             full_path = os.path.join(FOTOS_DIR, photo_path)
 
             if os.path.exists(full_path) and os.path.isfile(full_path):
